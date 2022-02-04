@@ -1,0 +1,5 @@
+La commande <sync> gère la synchronisation du shell entre différents ordinateurs clients. Elle permet de vérifier :
+        - si des modifications ont été apportées au code depuis la dernière sauvegarde du shell 
+        (=> sauvegarde : compression de l'intégralité du dossier local ~/bin et upload de l'archive sur dropbox)
+        - si la dernière sauvegarde du shell est plus récente que la version locale 
+        (=> synchronisation : téléchargement de la dernière sauvegarde disponible et mise-à-jour du dossier local)

@@ -1,0 +1,5 @@
+Téléchargement de la vidéo mp4/mkv du lien Youtube* fourni
+Cette commande fait appel au script <youtube-dl>
+Pour télécharger des vidéos en lot, les ajouter au fichier todl via la commande <todl> puis <ytdl>
+Pour télécharger uniquement la piste audio de la vidéo, utiliser la commande <adl>*
+

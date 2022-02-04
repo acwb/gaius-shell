@@ -1,0 +1,47 @@
+#!/bin/bash
+
+function flag {
+
+    if [ "$1" == "-v" ] ; then
+        flagstate="`cat $PATH_FLG/$2.flg`"
+        gmsg Flags -l -minus "$2: $flagstate"
+        
+    else
+        cat $PATH_FLG/$1.flg
+    fi
+    
+}
+
+
+function make_flag {
+
+    if [ "$1" == "-v" ] ; then
+        flag="$2"
+        value="$3"
+    else 
+        flag="$1"
+        value="$2"
+    fi
+
+    if [ "`flag $flag`" != "$value" ] ; then
+
+        if [ -f $PATH_FLG/$flag.flg ]; then 
+            #dmsg "Modification du flag $flag: $value"
+            cd $PATH_FLG
+            #rm $flag.flg  >/dev/null 2>&1
+        fi
+
+        
+        touch $PATH_FLG/$flag.flg
+        cd $PATH_FLG
+        echo $value > $flag.flg 
+
+        if [ "$1" == "-v" ] ; then
+            gmsg Gaius -l -ok "Flag $flag mis sur $value "
+        else
+            dmsg "Flag$BOLD $flag$RESET passé sur $value"
+        fi
+    else
+       dmsg "Flag $flag ($value) non modifié"
+    fi
+}

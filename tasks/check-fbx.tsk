@@ -1,0 +1,61 @@
+#!/bin/bash
+
+sleep 60
+
+
+# par défaut
+ISONLINE="0"
+FBXFAIL="0" 
+
+
+
+# tant qu'on est pas connecté
+while [ "$ISONLINE" == "0" ] && [ "$OFFLINEMODE" == "0" ] ; do
+
+
+
+    # on tente un ping vers la box
+    if pingfbx "1" ; then
+        ISONLINE="1"
+        LOCALIP="`ifconfig wlan0 2>/dev/null|awk '/inet adr:/ {print $2}'|sed 's/adr://'`"
+        REALIP="`dig +short myip.opendns.com @resolver1.opendns.com`"
+        CURRENTWIFI="`iwgetid -r`"
+        if [ "$FBXFAIL" -ge "1" ] ; then # si il y a eu au moins 1 échec
+            gmsg Freebox -l -n -ok "Connexion rétablie !"
+            notify-send "Freebox" "Connexion rétablie !"
+            amsg ding
+        fi
+        
+    else
+        ((FBXFAIL++))
+        ISONLINE="0"
+        amsg busy
+        if [ "$FBXFAIL" -ge "1" ] ; then # si il y a eu au moins 1 échec
+            gmsg Freebox -l -n -warn "Connexion indisponible ($FBXFAIL échecs)"
+            wait=$((FBXFAIL*5))
+            sleep $wait
+            if [ "$FBXFAIL" == "5" ] ; then
+                gmsg Freebox -l -n -warn "Connexion indisponible ($FBXFAIL échecs)"
+                sleep 60
+                break
+            fi
+        else
+            gmsg Freebox -l -n -warn "Connexion indisponible"
+            sleep 1
+        fi
+        
+        gmsg Gaia -warn "Appuyer sur une touche pour continuer en mode offline"
+        read -t 5 -s -n 1 -p " " key 
+        if [ "$?" -eq "0" ] ; then
+            OFFLINEMODE="1"
+            echo
+            gmsg Gaia -l -do "Lancement en mode offline.."
+            sleep 0.5
+        else
+            echo
+            gmsg Gaia -l -do "Tentative de connexion.."
+            sleep 0.5
+            continue
+        fi
+    fi
+done

@@ -1,0 +1,113 @@
+#!/bin/bash
+
+
+# webapp chrome/chromium "Nom WebApp" http://blablabla icon.png
+
+if [ -z "$2" ] ; then  
+    gmsg Gaius -ask "Navigateur à utiliser:" 
+    read -p " " -e wabrowser
+    if [ -z "$wabrowser" ]; then
+        exit
+    fi
+else
+    wabrowser="$2"
+    dmsg "Mise en var wabrowser: $wabrowser"
+fi
+
+if [ -z "$3" ] ; then
+    gmsg Gaius -ask "Nom de la webapp: " 
+    echo -n -e "" 
+    read name
+    if [ -z "$name" ]; then
+        exit
+    fi
+else
+    name="$3"
+    dmsg "Mise en var name: $name"
+fi
+
+if [ -z "$4" ] ; then
+    gmsg Gaius -ask "URL de la webapp: " 
+    echo -n -e "" 
+    read waurl
+    if [ -z "$waurl" ]; then
+        exit
+    fi
+else
+    waurl="$4"
+    dmsg "Mise en var waurl: $waurl"
+fi
+
+if [ -z "$5" ] ; then
+    dmsg "L'icône de la webapp doit être dans $WEBAPP_ICONPATH"
+    gmsg Gaius -ask "Nom du fichier icone: " 
+    echo -n -e "" 
+    read waicon
+    if [ -z "$waicon" ]; then
+        dmsg "Pas icône spécifiée, utilisation de l'icône générique"
+        waicon="generic.svg"
+    fi
+else
+    waicon="$5"
+    dmsg "Mise en var waicon: $waicon"
+fi
+
+
+
+# quand toutes les var sont remplies
+
+
+if [ -n "$wabrowser" ] ; then
+    
+    if [ "$wabrowser" == "chromium" ] ; then
+        browser="chromium-browser"
+        dmsg "Le paramètre chromium est modifié en chromium-browser"
+        param1=1
+    elif [ "$wabrowser" == "chrome" ] ; then  
+        browser="google-chrome"
+        dmsg "Le paramètre chrome est modifié en google-chrome"
+        param1=1
+    elif [ "$wabrowser" == "chromium-browser" ] ; then  
+        browser="chromium-browser"
+        param1=1
+    elif [ "$wabrowser" == "google-chrome" ] ; then  
+        browser="google-chrome"
+        param1=1
+    else
+        gmsg Gaius -l -error "Le browser est incorrect, doit être chrome ou chromium"
+        dmsg "Paramètre entré: $wabrowser"
+    fi
+fi
+
+if [ -n "$waicon" ] ; then
+
+    if [[ $waicon == *".png"* ]] || [[ $waicon == *".svg"* ]] ; then
+        dmsg "Le paramètre icone termine bien par .png ou .svg"
+        icon="$WEBAPP_ICONPATH/$waicon"
+        if [ ! -f $icon ]; then # on vérifie l'existence du fichier
+            gmsg Gaius -l -error "Le fichier $icon n'existe pas"
+        else
+            dmsg "Le fichier $icon existe bien"
+            param4=1
+        fi
+    else
+        gmsg Gaius -l -error "L'icône doit être au format PNG ou SVG, sans espace dans son nom"
+        dmsg "Paramètre entré: $waicon"
+    fi
+
+fi
+
+############
+# si tout est ok, on lance la fonction de création du fichier desktop
+
+if [ "$param1" == 1 ] && [ "$param4" == 1 ] ; then
+    dmsg -p "Aucune erreur, on peut lancer la fonction create_webapp($browser,$name,$waurl,$icon)"
+    gmsg Gaius -l -do "Configuration validée, création de la WebApp.."
+    dmsg "Appel à la fonction create_webapp $browser $name $waurl $icon"
+    create_webapp $browser $name $waurl $icon
+
+else
+    dmsg "Il y a une erreur quelque part, la fonction n'est pas executée"
+fi
+
+

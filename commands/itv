@@ -1,0 +1,10 @@
+#!/bin/bash
+
+WEBAPPNAME="iTélé"
+WEBAPPURL="http://itele.fr/direct"
+
+nohup $APP_BROWSER_BIS --app=$WEBAPPURL > /dev/null 2>&1&
+gmsg Gaius -ok "Ouverture de $WEBAPPNAME dans $APP_BROWSER_BIS"
+sleep 1
+guake -t
+echo

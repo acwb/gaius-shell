@@ -1,0 +1,8 @@
+#!/bin/bash
+
+WEBAPPNAME="FIP"
+WEBAPPURL="http://www.fipradio.fr/player"
+WEBAPPBROWSER="google-chrome"
+
+open_webapp $WEBAPPBROWSER $WEBAPPNAME $WEBAPPURL
+echo

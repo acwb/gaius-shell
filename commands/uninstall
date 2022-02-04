@@ -1,0 +1,7 @@
+#!/bin/bash
+
+
+   echo -n "Paquet à désinstaller : "
+   read paquet
+   echo
+   sudo apt-get remove $paquet

@@ -1,0 +1,3 @@
+Permet d'effectuer des opérations sur des noms de fichiers par lot (un répertoire) :
+* remplacement de caractères (espace <=> tirets, etc)
+* gestion majuscule / minuscule

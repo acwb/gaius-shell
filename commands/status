@@ -1,0 +1,29 @@
+# affichage du header
+source "$PATH_CMD/header"
+echo
+echo
+
+source $PATH_SCR/freebox -q
+
+gaius_syncstatus
+
+local_dirsize ~/bin
+local_dirsize ~/Downloads
+local_dirsize ~/Transit
+local_dirsize ~/
+
+fbx_status
+wifi_status
+
+todo_count
+
+
+
+# infos sirius 
+# status on/off, services (cf conky), check ttt (wget?)
+
+# infos backup
+# nom dernier fichier=>date pour backup shell, gaia, sirius, ttt..
+
+# nombre d'éléments dans les fichiers
+# todo, todl

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# effet ligne par ligne uniquement au démarrage
+if [ "$loaded" == 0 ] ; then
+    timeline="0.1"
+else
+    timeline="0"
+fi
+
+echo
+echo -e "$GRIS1   ██████╗  █████╗ ██╗██╗   ██╗███████╗     $RESET $BOLD Gaius Shell $UNBOLD$GRIS2(# $$) $RESET"
+sleep $timeline
+echo -e "$GRIS1  ██╔════╝ ██╔══██╗██║██║   ██║██╔════╝      $RESET $CLIENTNAME ($CLIENTDESC)  $battinfos"
+sleep $timeline
+echo -e "$GRIS1  ██║  ███╗███████║██║██║   ██║███████╗      $RESET $DISTRIB_DESCRIPTION "
+sleep $timeline
+echo -e "$GRIS1  ██║   ██║██╔══██║██║██║   ██║╚════██║     $RESET $UPTIME "
+sleep $timeline
+echo -e "$GRIS1  ╚██████╔╝██║  ██║██║╚██████╔╝███████║      $RESET $LOCALIP @ $CURRENTWIFI / $REALIP"
+sleep $timeline
+echo -e "$GRIS1  ╚═════╝ ╚═╝  ╚═╝╚═╝ ╚═════╝ ╚══════╝ $RESET "
+                                     

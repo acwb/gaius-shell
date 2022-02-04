@@ -1,0 +1,7 @@
+#on enlève le mot google de $@
+
+googrequest="$@"
+googrequest=${googrequest:7}
+gmsg Gaius -l -do "Recherche sur Google de : $googrequest"
+google-chrome http://www.google.com/search?hl=en#q=\"`encode $googrequest`\"
+echo

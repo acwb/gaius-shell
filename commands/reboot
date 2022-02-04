@@ -1,0 +1,27 @@
+#!/bin/bash
+
+echo
+
+if [ "$2" == "-f" ] ; then
+    echo
+    dmsg "Commande reboot avec l'option -f (force)"
+    gmsg Gaius -l -ok "Be right back master.." ;
+    shutdown -r now
+
+else
+
+    for (( i=4; i>0; i--)); do
+        printf "\r$BOLD$CYAN1 Gaia → $RESET Reboot dans $GRIS1$BOLD$i$RESET secondes, presser une touche pour annuler"
+        read -s -n 1 -t 1 key
+        if [ $? -eq 0 ]
+        then
+            echo
+            gmsg Gaius -l -notice "Reboot annulé"
+            exit
+        fi
+    done
+    echo
+    gmsg Gaius -l -ok "Be right back master.." ;
+    shutdown -r now
+
+fi

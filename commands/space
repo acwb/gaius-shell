@@ -1,0 +1,184 @@
+#!/bin/bash
+ 
+
+echo
+gmsg Gaius -ask "Path du dossier à traiter (sans / final) : ~/"
+echo -n -e ""
+read path 
+
+if [ -z "$path" ] ; then
+    gmsg Gaius -l -error "Annulation"
+        prompt
+fi
+
+pathoutput="~/$path"
+path="/home/toto/$path"
+cd $path
+
+echo
+echo "  1. Remplacer les espaces par des _"
+echo "  2. Remplacer les espaces par des -"
+echo "  3. Remplacer les espaces par des ."
+echo "  4. Remplacer les espaces par un autre caractère"
+echo "  5. Remplacer les _ par des espaces"
+echo "  6. Remplacer les - par des espaces"
+echo "  7. Remplacer un autre caractère par des espaces"
+echo "  8. Remplacement de caractères spécifiques"
+echo "  9. Décapitalisation des noms de fichiers"
+echo " 10. Capitalisation des premiers mots"
+echo " 11. Annuler l'opération"
+echo
+gmsg Gaius -ask "Quelle action sur les fichiers de $pathoutput : "
+local choice
+	read -p "" choice
+	case $choice in
+    
+		1) # SPACE ==> _
+            gmsg Gaius -l -do "Remplacement des espaces par des _ dans le dossier $pathoutput"
+            echo
+            cd $path
+            for i in "$path/"*; do
+                mv -v "$i" "${i// /_}"
+            done
+            gmsg Gaius -l -ok "Opération terminée : Remplacement des espaces par des _ dans $pathoutput"   
+        ;;
+        
+		2) # SPACE ==> -
+            gmsg Gaius -l -do "Remplacement des espaces par des - dans le dossier $pathoutput"
+            echo
+            cd $path
+            for i in "$path/"*; do
+                mv -v "$i" "${i// /-}"
+            done
+            gmsg Gaius -l -ok "Opération terminée : Remplacement des espaces par des - dans $pathoutput"   
+        
+        ;;
+        
+		3) # SPACE ==> .
+            gmsg Gaius -l -do "Remplacement des espaces par des . dans le dossier $pathoutput"
+            echo
+            cd $path
+            for i in "$path/"*; do
+                mv -v "$i" "${i// /.}"
+            done
+            gmsg Gaius -l -ok "Opération terminée : Remplacement des espaces par des . dans $pathoutput"   
+        
+        ;;
+        
+        4) # SPACE => custom character
+            gmsg Gaius -ask "Remplacer les espaces par le(s) caractère(s) : "
+            echo -n -e ""
+            read replaceby  
+            gmsg Gaia -l -do "Remplacement des espaces par des $replaceby dans le dossier $pathoutput"
+            echo
+            cd $path
+            for i in "$path/"*; do
+                mv -v "$i" "${i// /$replaceby}"
+            done
+            gmsg Gaius -l -ok "Opération terminée : Remplacement des espaces par des $replaceby dans $pathoutput"   
+        ;;
+        
+        5) # _ ==> SPACE
+            gmsg Gaius -l -do "Remplacement des _ par des espaces dans le dossier $pathoutput"
+            echo
+            cd $path
+            for i in "$path/"*; do
+                mv -v "$i" "${i//_/ }"
+            done
+            gmsg Gaius -l -ok "Opération terminée : Remplacement des _ par des espaces dans $pathoutput"   
+        ;;
+        
+        6) # - ==> SPACE
+            gmsg Gaius -l -do "Remplacement des - par des espaces dans le dossier $pathoutput"
+            echo
+            cd $path
+            for i in "$path/"*; do
+                mv -v "$i" "${i//-/ }"
+            done
+            gmsg Gaius -l -ok "Opération terminée : Remplacement des espaces des _ par des espaces dans $pathoutput"   
+        ;;
+        
+        7) # custom character => SPACE
+            gmsg Gaius -ask "Mettre des espaces à la place du/des caractère(s) : "
+            echo -n -e ""
+            read replace
+            gmsg Gaius -l -do "Remplacement des $replace des par des espaces dans le dossier $pathoutput"
+            echo
+            cd $path
+            for i in "$path/"*; do
+                mv -v "$i" "${i//$replace/ }"
+            done
+            gmsg Gaius -l -ok "Opération terminée : Remplacement des $replace des par des espaces dans le dossier $pathoutput"
+        ;;
+        
+        8) # custom character => custom character
+            gmsg Gaius -ask "Remplacer les caractères : "
+            echo -n -e ""
+            read replace 
+            gmsg Gaius -ask "Par des caractères : "
+            echo -n -e ""
+            read replaceby
+            gmsg Gaius -l -do "Remplacement des $replace par des $replaceby dans le dossier $pathoutput"
+            echo
+            cd $path
+            for i in "$path/"*; do
+                mv -v "$i" "${i//$replace/$replaceby}"
+            done
+            gmsg Gaius -l -ok "Opération terminée : Remplacement des $replace par des $replaceby dans le dossier $pathoutput"
+        ;;
+        
+        
+        9) # enlever les majuscules à chaque mots
+            gmsg Gaius -l -do "Décapitalisation des noms de fichiers dans le dossier $pathoutput"
+            echo
+            cd $path
+            for i in "$path/"*; do
+                uncap=`echo "$i" | tr A-Z a-z `
+                mv -v "$i" "$uncap";
+            done   
+            echo
+            gmsg Gaius -notice "Recapitaliser le premier mot ? [*] ?"
+            read -p " " -r  confirm
+            echo
+            if [ -n "$confirm" ]; then
+                gmsg Gaius -l -do "Capitalisation du premiers caractères dans le dossier $pathoutput"
+                cd $path
+                for i in  *; do
+                    recap=`echo "$i" | sed -e 's/^./\U&/'  `
+                    mv -v "$i" "$recap";
+                done
+                gmsg Gaius -l -ok "Opération terminée : Décapitalisation et recapitalisation des noms de fichiers dans le dossier $pathoutput"
+            else
+                gmsg Gaius -l -ok "Opération terminée : Décapitalisation des noms de fichiers dans le dossier $pathoutput"
+            fi
+        ;;
+        
+        10) # Rajouter une seule majuscule au début
+            gmsg Gaius -l -do "Capitalisation du premiers caractères dans le dossier $pathoutput"
+            echo
+            cd $path
+            for i in  *; do
+                recap=`echo "$i" | sed -e 's/^./\U&/'  `
+                mv -v "$i" "$recap";
+            done
+            gmsg Gaius -l -ok "Opération terminée : Capitalisation du premiers caractères dans le dossier $pathoutput"
+        ;;
+        
+        
+        
+        
+        
+        11) 
+        gmsg Gaius -l -notice "Annulation"
+        prompt
+        ;;
+        
+		*) 
+        gmsg Gaius -l -error "Annulation"
+        prompt
+        
+        
+        
+        
+        
+	esac

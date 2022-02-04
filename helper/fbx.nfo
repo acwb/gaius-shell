@@ -1,0 +1,2 @@
+Récupère des données de la Freebox et simule la télécommande de la box TV pour envoyer des instructions de reboot.
+Paramètres disponibles: key, reboot, rebootadsl, reboottv, rebootpostadsl, tvoff, tvon, infos, status, uptime, atm, attenuation, snr, fec, hec, crc, rates

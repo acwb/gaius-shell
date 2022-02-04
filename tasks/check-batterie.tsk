@@ -1,0 +1,75 @@
+#!/bin/bash
+
+ gmsg Gaia -l -do "Test de la commande" &>/dev/null
+ 
+notify-send "Test de la commande"
+
+battpath="/sys/class/power_supply/BAT0"
+ ALERT_PERC=99
+ 
+
+ 
+ if [ -d $path ]; then
+    if [ "$perc" -lt "$ALERT_PERC" ]; then
+        if [ "$bat_status" == "Discharging" ]; then
+            echo -e -n "\b\b\b"
+            gmsg Gaia -l -warn "$ROUGE2$BOLD Attention: batterie chargée à $perc $RESET"
+            echo "Attention: batterie chargée à $perc"
+            notify-send "Batterie>" "Autonomie: ${perc}%"
+      fi
+    fi
+fi
+
+
+
+
+# si batterie non détectée
+if [ ! -d  $path ]; then
+    gmsg Gaia -l -error "Batterie non détectée, alimentation secteur."
+
+# sinon on charge le reste du script
+else
+    #
+    # Get Charge Information
+    #
+
+    # Get current battery charge
+    typeset -i charge_now=$(cat $path"/charge_now")
+
+    # Get full battery charge
+    typeset -i charge_full=$(cat $path"/charge_full")
+
+    # Get the difference of the current vs the full
+    # charge
+    dif=$((charge_full - charge_now))
+
+    # Finally get the percent charged
+    perc=$((100-(100*dif/charge_full)))
+
+    #
+    # Get battery status
+    #
+
+    # Get status (Charging / Discharging)
+    bat_status=$(cat $path"/status")
+    
+    gmsg Gaia -l -ok "Batterie détectée et en service"
+
+    #
+    # Check for low battery & check for battery status.
+    # If battery is below ALERT_PEC and the battery is
+    # not charging, than send user a notification. Use
+    # a 'while' loop to run the code over and over, and
+    # use a sleep statement to only do this every 3 min.
+    #
+    if [ "$perc" -lt "$ALERT_PERC" ]; then
+        if [ "$bat_status" == "Discharging" ]; then
+            gmsg Gaia -l -warn "Attention: batterie chargée à $perc"
+            notify-send "<b>Alert!!</b>" "Battery is currently ${perc}%!"
+        fi
+    fi
+
+    battcapa=${perc}
+    battstatus=$bat_status
+
+fi

@@ -1,0 +1,344 @@
+#!/bin/bash
+
+function countentries {
+
+    grep -o "~" $1 | wc -l 
+}
+
+function motd_show {
+
+    _file="$PATH_TMP/motd.txt"  
+    [ ! -f "$_file" ] && { echo "Error: $0 file not found.";  }
+
+    if [ -s "$_file" ]  
+    then  
+        echo
+        echo -n " "
+        cat $_file
+    else  
+        dmsg "Le fichier MOTD est vide."
+    fi  
+    
+}
+
+function todo_count {
+
+    nbtodo=$(cat $PATH_DBX/Applications/todotxttdi/todo.txt | sed '/^\s*$/d' | wc -l)
+    if [ "$nbtodo" != "0" ] ; then
+        gmsg Gaius -l "$nbtodo entrées dans todo.txt"
+    fi
+}
+
+# convertir une date en octet en format lisible
+function format_size { 
+    taille=$1
+    if test $taille -lt 1024
+    then
+        echo "$taille octets"
+    elif test "$taille" -lt "1048576"
+    then
+        echo "$( echo "scale=2;$taille/1024" | bc -l) Ko"
+    elif test "$taille" -lt "1073741824"
+    then
+        echo "$( echo "scale=2;$taille/1048576" | bc -l) Mo"
+    else
+        echo "$( echo "scale=2;$taille/1073741824" | bc -l) Go"
+    fi
+}
+
+# récupère la taille d'un fichier
+function get_size {
+    fichier=$1
+    taille=$(ls -l $fichier | cut -d\  -f 5)
+    if test $taille -lt 1024
+    then
+        echo "$taille octets"
+    elif test "$taille" -lt "1048576"
+    then
+        echo "$( echo "scale=2;$taille/1024" | bc -l) Ko"
+    elif test "$taille" -lt "1073741824"
+    then
+        echo "$( echo "scale=2;$taille/1048576" | bc -l) Mo"
+    else
+        echo "$( echo "scale=2;$taille/1073741824" | bc -l) Go"
+    fi
+}
+
+
+function wifi_status { # à modifier (paramètre?) pour interface ethernet pour Solar
+    wfi_quality=$(iwconfig wlan0 | grep -i signal | awk '{print $2}')
+    wfi_quality=${wfi_quality:8}
+    wfi_signal=$(iwconfig wlan0 | grep -i signal | awk '{print $4}')
+    wfi_signal=${wfi_signal:6}
+    CURRENTWIFI="`iwgetid -r`"
+    gmsg Wifi -l -notice "Connecté à$BOLD $CURRENTWIFI : $LOCALIP / $REALIP $RESET- Réception: $wfi_quality ($wfi_signal dBm)" 
+}
+
+function fbx_status {
+
+    fbx_uptime=$(get_uptime)
+    fbx_uptime=${fbx_uptime:14:-6}
+    fbx_status=$(get_status)
+    fbx_status=${fbx_status: -1}
+    if [ "$fbx_status" == "1" ]; then
+        gmsg Fbox -l -notice "Statut:$BOLD$VERT1 ON $RESET- Uptime: $fbx_uptime"
+    else
+        gmsg Fbox -l -notice "Statut:$BOLD$ROUGE1 OFF $RESET- Uptime: $fbx_uptime"
+    fi
+
+}
+
+function local_diskspace {
+
+    gmsg $CLIENTNAME && echo -n "Espace disque: $(df -kh /tmp | tail -1 | awk '{print $3}')" && echo " / $(df -kh /tmp | tail -1 | awk '{print $2}')"
+
+}
+
+function local_dirsize {  # paramètre $1 => path
+
+    gmsg $CLIENTNAME && echo "Taille de $1: $(du -sh $1 2>/dev/null | tail -1 | awk '{print $1}')"
+
+}
+
+function gaius_lastedit {
+
+    # check du dernier fichier modifié
+    cd /home/toto/bin
+    LASTMODGAIUS=$(find . ! -path "*/temp*" ! -path "*/flags*" ! -path "*/logs*" -exec stat \{} --printf="%y\n" \; | sort -n -r | head -n 1)
+    # formatage date longue > timestamp > date formatée
+    LASTMODGAIUSTIMESTAMP=$(date --date="$LASTMODGAIUS" +"%s")
+    LASTMODGAIUS=$(date -d @$LASTMODGAIUSTIMESTAMP)
+    LASTMODGAIUS=${LASTMODGAIUS:0:-11}
+
+    if [ "$1" != "-q" ]; then
+        gmsg Sync -l -notice "Dernière modification de Gaius: $LASTMODGAIUS"
+        sleep 0.2
+    else
+        dmsg "Dernière modification de Gaius: $LASTMODGAIUS ($LASTMODGAIUSTIMESTAMP)"
+    fi
+    
+}
+
+function gaius_lastsync {
+    
+    # check de la date des derniers backups
+    LASTBACKUPGAIUSTIMESTAMP=$(cat $PATH_FLG/lastbackup-gaius.flg)
+
+    # formatage timestamp > date formatée
+    LASTBACKUPGAIUS=$(date -d @$LASTBACKUPGAIUSTIMESTAMP)
+    LASTBACKUPGAIUS=${LASTBACKUPGAIUS:0:-11}
+
+    if [ "$1" != "-q" ]; then
+        gmsg Sync -l -notice "Dernière sauvegarde de Gaius: $LASTBACKUPGAIUS"
+        sleep 0.2
+    else
+        dmsg "Dernière sauvegarde de Gaius: $LASTBACKUPGAIUS ($LASTBACKUPGAIUSTIMESTAMP)"
+    fi
+
+}
+
+function gaius_lastupload {
+    
+    # récup de la date du dernier upload contenue dans un txt sur dropbox
+    rm $PATH_TMP/lastupload.txt  &>/dev/null
+    bash $PATH_SCR/dropbox/dropbox_uploader.sh download Backups/Gaius/lastupload.txt $PATH_TMP/lastupload.txt &>/dev/null
+    LASTUPLOADTIMESTAMP=$(cat $PATH_TMP/lastupload.txt)
+    
+    # formatage timestamp > date formatée
+    LASTUPLOAD=$(date -d @$LASTUPLOADTIMESTAMP)
+    LASTUPLOAD=${LASTUPLOAD:0:-11}
+    
+
+    if [ "$1" != "-q" ]; then
+        gmsg Sync -l -notice "Dernière sauvegarde synchronisée: $LASTUPLOAD"
+        sleep 0.2
+    else
+        dmsg "Dernière sauvegarde synchronisée: $LASTUPLOAD ($LASTUPLOADTIMESTAMP)"
+    fi
+
+}
+
+    
+
+
+function gaius_syncstatus {
+
+    gaius_lastupload
+    gaius_lastedit
+    gaius_lastsync
+    
+    # on commence par comparer la date du dernier upload et celle du dernier backup
+    # = on vérifie qu'il n'y a pas une sauvegarde depuis un ordinateur différent
+    if [ "$LASTUPLOADTIMESTAMP" -gt "$LASTBACKUPGAIUSTIMESTAMP" ]; then
+        dmsg "Le timestamp du dernier backup sur dropbox est : $LASTUPLOADTIMESTAMP"
+        dmsg "Le timestamp du dernier upload vers dropbox est : $LASTBACKUPGAIUSTIMESTAMP"
+        dmsg "Une version plus récente est sur dropbox"
+        updatetodl=1
+    else
+        dmsg "Le timestamp du dernier backup sur dropbox est : $LASTUPLOADTIMESTAMP"
+        dmsg "Le timestamp du dernier upload vers dropbox est : $LASTBACKUPGAIUSTIMESTAMP"
+        dmsg "Le dernier upload sur dropbox correspond au dernier backup local"
+        updatetodl=0
+    fi
+
+    
+    
+    # comparaison des dates
+    if [ "$LASTBACKUPGAIUSTIMESTAMP" -gt "$LASTMODGAIUSTIMESTAMP" ]; then
+        modtosave=0
+    else
+        modtosave=1
+        prompterror=2
+    fi
+    
+    
+    if [ "$updatetodl" == "0" ] && [ "$modtosave" == "0" ]; then
+        dosync="rien"
+        if [ "$1" != "-q" ]; then
+            gmsg Gaius -l -ok "Etat de la synchronisation :$BOLD$VERT1 à jour et synchronisé $RESET"
+        else
+            dmsg "Etat de la synchronisation:$BOLD$VERT1 OK $RESET"
+        fi
+        
+    elif [ "$updatetodl" == "0" ] && [ "$modtosave" == "1" ]; then
+        dosync="tosave"
+        gmsg Gaius -l -warn "Etat de la synchronisation :$BOLD$ROUGE1 modifs à sauvegarder $RESET" 
+        notify-send "Gaius:" "Le shell a besoin d'être sauvegardé"
+    
+    elif [ "$updatetodl" == "1" ] && [ "$modtosave" == "0" ]; then
+        dosync="toupdate"
+        gmsg Gaius -l -ok "Etat de la synchronisation :$BOLD$BLEU2 update disponible $RESET"
+        notify-send "Gaius:" "Mise à jour disponible"
+
+    elif [ "$updatetodl" == "1" ] && [ "$modtosave" == "1" ]; then
+        
+        gmsg Gaius -l -ask "Etat de la synchronisation :$BOLD$ROUGE2 modifications non-enregistrées + update disponible $RESET" 
+        notify-send "Gaius:" "Erreur: Modifications non enregistrées + Update disponible. Que faire ?"
+        echo " [U]ploader la version locale  -  [T]élécharger la mise à jour  -  Ne [R]ien faire"
+        local choice
+        read -p " " choice
+        case $choice in
+            U | u) dosync="tosave" ;;
+            T | t) dosync="toupdate" ;;
+            r | r) dosync="rien" ;;
+            *) dosync="rien"
+        esac
+        
+        
+        
+    else
+        gmsg Gaius -l -error "Erreur de variables/conditions, aller checker le code dans lib/status.fn > gaius_syncstatus () " 
+    fi
+    
+    
+    
+
+    
+}
+
+function gaius_sync {
+
+
+    gaius_syncstatus
+  
+
+    if [ "$dosync" == "tosave" ]; then
+        autobackup=0
+        sleep 0.5        
+        if [ "$1" != "-q" ]; then 
+            if [ "$autobackup" == 0 ];then
+                gmsg Gaius -askauto 
+                for (( i=3; i>0; i--)); do
+                    printf "\r$BOLD$CYAN2 Gaius → $RESET [$i] Appuyer sur une touche pour lancer la synchro.."
+                    read -s -n 1 -t 1 key
+                    if [ $? -eq 0 ]
+                    then
+                        i=0
+                        echo
+                        source $PATH_CMD/autobackup -auto
+                        notify-send "Gaius:" "Shell sauvegardé avec succès"
+                        sleep 0.3
+                        prompterror=0
+                        autobackup=1
+                        gaius_syncstatus
+                        reprompt
+                    fi
+                done
+            fi
+            if [ "$autobackup" != 1 ];then
+                echo -e "\r$BOLD$CYAN1 Gaius → $RESET Utiliser la commande $BOLD<sync>$RESET pour sauvegarder le shell                               "
+                prompterror=2
+                sleep 0.2
+            fi
+        fi
+    fi
+    
+    if [ "$dosync" == "toupdate" ]; then
+        autoupdate=0
+        sleep 0.5        
+        if [ "$1" != "-q" ]; then 
+            if [ "$autoupdate" == 0 ];then
+                gmsg Gaius -askauto 
+                for (( i=3; i>0; i--)); do
+                    printf "\r$BOLD$CYAN2 Gaius → $RESET [$i] Appuyer sur une touche pour lancer la mise à jour.."
+                    read -s -n 1 -t 1 key
+                    if [ $? -eq 0 ]
+                    then 
+                        i=0
+                        echo
+                        notify-send "Gaius:" "Mise à jour du shell.."
+                        gmsg Gaius -l -do "Téléchargement de la dernière version.."
+                        bash $PATH_SCR/dropbox/dropbox_uploader.sh download Backups/Gaius/lastupload.txt $PATH_TMP/lastupload.txt  &>/dev/null
+                        # transformer le timestamp dans le format du filename
+                        updatetimestamp=$(cat $PATH_TMP/lastupload.txt)
+                        updatetime=$(date -d @$updatetimestamp +%Y.%m.%d-%Hh%M)
+                        updatefilename="gaius-backup-$updatetime.tar"
+                        bash $PATH_SCR/dropbox/dropbox_uploader.sh download Backups/Gaius/$updatefilename $PATH_TMP/update/$updatefilename   &>/dev/null
+                        
+                        
+                        gmsg Gaius -l -do "Backup de la version actuelle"     
+                        BACKUPTIME=$(date +%Y.%m.%d-%Hh%M)
+                        cd /home/toto
+                        dmsg "Execution de la commande: tar -cf /home/toto/Backups/Gaius/gaius-backupbeforeupdate-$BACKUPTIME.tar bin"
+                        tar -cf /home/toto/Backups/Gaius/gaius-backupbeforeupdate-$BACKUPTIME.tar bin &>/dev/null
+                        
+                        gmsg Gaius -l -do "Installation de la mise à jour"
+                        dmsg "Execution de la commande: "
+                        tar -xvf $PATH_TMP/update/$updatefilename -C $PATH_USER/ &>/dev/null
+                        make_flag lastbackup-gaius $updatetimestamp
+                        gmsg Gaius -l -ok "Mise à jour du shell terminée"
+                        notify-send "Gaius:" "Shell mis à jour avec succès"
+                        sleep 0.3
+                        prompterror=0
+                        autoupdate=1
+                        gaius_syncstatus
+                        reprompt
+                    fi
+                done
+            fi
+            if [ "$autoupdate" != 1 ];then
+                echo -e "\r$BOLD$CYAN1 Gaius → $RESET Utiliser la commande $BOLD<sync>$RESET pour mettre à jour le shell                               "
+                prompterror=2
+                sleep 0.2
+            fi
+        fi
+    fi
+    
+    if [ "$dosync" == "rien" ]; then
+        dmsg "Pas d'action de synchro nécessaire"
+    fi
+    
+}
+
+
+function client_check {
+
+    COMPUTERS=( Solar Gaia Sirius)
+    
+    for COMPUTER in ${COMPUTERS[@]}; do
+        if [ "${COMPUTER}" == "$(hostname)" ]; then
+            gmsg Gaius -l -notice "Détection du client :$BOLD $DISTRIB_DESCRIPTION @ $(hostname)$RESET ($CLIENTDESC) " && sleep 0.2
+            make_flag client $(hostname)
+        fi
+    done
+}

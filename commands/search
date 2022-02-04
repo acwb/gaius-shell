@@ -1,0 +1,25 @@
+#!/bin/bash
+
+gmsg Gaius -l -notice "Rechercher un fichier par :"
+select yn in "Nom" "Expression" "Quitter" ; do
+    case $yn in
+        Nom ) 
+            gmsg Gaius -do "Nom du fichier :"
+            read searchfile
+            gmsg Gaius -do "Emplacement :"
+            read searchpath
+            find $searchpath -name $searchfile -print
+            ;;
+        Expression ) 
+            gmsg Gaius -do "Expression :"
+            read searchexp
+            gmsg Gaius -do "Emplacement :"
+            read searchpath
+            grep -ri "$searchexp" $searchpath
+            ;;
+        Quitter ) 
+           
+            exit;;
+    esac
+    
+done

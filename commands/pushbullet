@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo
+source $PATH_SCR/pushbullet $2 $3 $4 $5 $6 $7 $8

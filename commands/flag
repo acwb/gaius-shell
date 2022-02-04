@@ -1,0 +1,27 @@
+#!/bin/bash
+
+
+if [ -z "$2" ] && [ -z "$3" ] ; then
+    gmsg Gaius -l -notice "Syntaxe: flag <type> <statut>"
+elif [ -n "$2" ] && [ -z "$3" ] ; then
+    flagstate=$(cat $PATH_FLG/$2.flg)
+    if [ "$flagstate" == "on" ]; then
+        gmsg Gaius -l -ok "Changement du flag $2 : ON vers OFF"
+        make_flag -v $2 "off"
+    elif [ "$flagstate" == "off" ]; then
+        gmsg Gaius -l -ok "Changement du flag $2 : OFF vers ON"
+        make_flag -v $2 "on"
+    else
+        gmsg Gaius -notice "Etat du flag $2 : "
+        cat $PATH_FLG/$2.flg 
+    fi
+    echo
+else
+    param="$2"
+    value="$3"
+    make_flag -v $param $value
+    echo
+fi
+
+
+

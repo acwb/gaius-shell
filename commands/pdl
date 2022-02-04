@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+    echo -n "URL de la playlist YouTube : "
+    read vidurl
+    if [ -n "$vidurl" ]; then
+        echo
+        gmsg Gaius -notice "Lancement du téléchargement de $vidurl"
+        echo
+        youtube-dl --yes-playlist --ignore-errors --write-description --no-overwrites -o '$PATH_YTDLD/yt-dl/%(title)s/%(title)s_%(width)sx%(height)s.%(id)s.%(ext)s' $vidurl 
+    fi

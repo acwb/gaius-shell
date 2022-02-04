@@ -1,0 +1,46 @@
+#!/bin/bash
+
+
+
+# navigation vers destination (no var in parameters)
+cd ~/
+cd $PATH_DL/stream/
+
+if [ -n "$2" ] ; then
+    vidurl="$2"
+else
+    gmsg Gaius -notice "URL de la vidéo à télécharger ?"
+    echo -n " "
+    read vidurl
+fi
+
+if [ -n "vidurl" ] ; then
+
+    # PARAMETRES
+    if [[ $vidurl == *youtube* ]]; then
+        parameters="%(extractor)s/%(uploader)s/%(title)s/%(title)s_%(width)sx%(height)s.%(id)s.%(ext)s"
+    else
+        parameters="%(extractor)s/%(title)s/%(title)s_%(width)sx%(height)s.%(id)s.%(ext)s"
+    fi
+
+    gmsg Gaius -l -do "Lancement du téléchargement de $vidurl"
+    echo
+    
+    # on récupère l'idée du terminal courant
+    #currenttab=$(guake -g)
+    # on ouvre un nouveau prompt
+    #guake --new-tab=2 --rename-tab="Gaia" --execute-command="gaia" 
+    # on reswitch sur celui d'origine
+    #guake -s $currenttab
+    youtube-dl --no-playlist --write-description --console-title --all-subs  -o "$parameters" $vidurl 
+    echo
+    gmsg Gaius -l -n -notice "Opération terminée"
+
+
+else 
+    gmsg Gaius -l -n -notice "Opération annulée"
+fi
+
+        
+
+    

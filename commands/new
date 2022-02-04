@@ -1,0 +1,2 @@
+gmsg Gaius -l -notice "Ouverture d'un nouveau terminal"
+guake --new-tab=2 --rename-tab="Gaia" --execute-command="gaia" 

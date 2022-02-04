@@ -1,0 +1,26 @@
+#!/bin/bash
+
+echo -n "Chemin (fichier ou répertoire) : ~/"
+    read file
+    echo 
+    if [[ ${file: -1} =~ ^[/]$ ]] ; then
+            gmsg Gaius -notice "Conversion d'un répertoire : $file"
+            echo -n "Extension de fichier concernée : ."
+            read filext
+            for i in $file*.$filext; do echo; avconv -i "$i" "${i/.$filext/.mp3}"; done
+            echo
+            gmsg Gaius -ok "Conversion terminée de : $file*.$filext"
+            echo -n "Supprimer les anciens fichiers $filext ? "
+            read confirmdel
+            echo
+            if [[ $confirmdel =~ ^[oO]$ ]] ; then 
+                rm -v $file*.$filext
+                echo
+                gmsg Gaius -ok "Anciens fichiers $filext dans $file supprimés avec succès."
+            else
+                gmsg Gaius -warn "Anciens fichiers $filext dans $file conservés."
+            fi
+    else
+            gmsg Gaius -notice "Conversion d'un fichier unique : $file"
+            avconv -i $file -c:a libmp3lame -ab 320k -y ${file::-4}.mp3
+    fi  

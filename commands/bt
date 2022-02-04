@@ -1,0 +1,44 @@
+#!/bin/bash
+
+    echo
+    echo -n "Transmission > "
+    read transcommand
+    if [ $transcommand = "add" ] ; then
+        echo -n "URL du torrent : "
+        read urltorr
+        echo
+        ssh toto@192.168.0.10 -p 5910 "transmission-remote --auth toto:toto -a $urltorr"
+    elif [ $transcommand = "clean" ] ; then
+        TR_CMD="transmission-remote 192.168.0.10:9091 --auth toto:toto"
+        TORRENTLIST=`$TR_CMD --list | sed -e '1d;$d;s/^ *//' | cut --only-delimited --delimiter=' ' --fields=1`
+
+        for TORRENTID in $TORRENTLIST
+        do
+        echo
+        gmsg Gaius -l -notice "Traitement du torrent # $TORRENTID"
+
+        DL_COMPLETED=`$TR_CMD --torrent $TORRENTID --info | grep "Percent Done: 100%"`
+        STATE_STOPPED=`$TR_CMD --torrent $TORRENTID --info | grep "State: Stopped\|Finished\|Idle"`
+        if [ "$DL_COMPLETED" != "" ] && [ "$STATE_STOPPED" != "" ]; then
+            gmsg Transmission -l -notice "Le téléchargement du torrent est terminé."
+            gmsg Transmission -l -ok  "Suppression du torrent de la liste."
+            $TR_CMD --torrent $TORRENTID --remove
+        else
+            gmsg Transmission -l -warn  "Le téléchargement du torrent est en cours."
+        fi
+        done
+    elif [ $transcommand = "restart" ] ; then
+        ssh toto@192.168.0.10 -p 5910 "sudo service transmission-daemon restart"
+    elif [ $transcommand = "limit" ] ; then
+        ssh toto@192.168.0.10 -p 5910 "transmission-remote --auth toto:toto --alt-speed"
+        gmsg Transmission -l -ok  "Limitations alternatives de débit activées"
+    elif [ $transcommand = "unlimit" ] ; then
+        ssh toto@192.168.0.10 -p 5910 "transmission-remote --auth toto:toto --no-alt-speed | transmission-remote --auth toto:toto --no-downlimit "
+        gmsg Transmission -l -ok  "Limitations alternatives de débit désactivées"
+    elif [ $transcommand = "speed" ] ; then
+        echo -n "Limiter le débit download (KB/s) à : "
+        read dlimit
+        ssh toto@192.168.0.10 -p 5910 "transmission-remote --auth toto:toto --downlimit $dlimit"
+    else 
+        gmsg Transmission -l -error  "Commande non reconnue."
+    fi

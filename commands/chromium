@@ -1,0 +1,4 @@
+#!/bin/bash
+
+$APP_BROWSER $2 $3 $4 $5
+guake -t

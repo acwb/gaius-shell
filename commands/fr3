@@ -1,0 +1,8 @@
+#!/bin/bash
+
+WEBAPPNAME="France3"
+WEBAPPURL="http://m.pluzz.francetv.fr/france3"
+WEBAPPBROWSER="google-chrome"
+
+open_webapp $WEBAPPBROWSER $WEBAPPNAME $WEBAPPURL
+echo

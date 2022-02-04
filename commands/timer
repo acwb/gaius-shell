@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# si aucun argument donné, on demande
+if [ -z "$2" ] ; then
+    echo -n "Temps avant alarme (00s, 00m, 00m ou HH:MM:SS) : "
+    read timermin
+    if [ -z "$timermin" ] ; then
+        exit
+    fi
+    echo -n "Commande (alarme si non-renseignée) : "
+    read runafter
+else
+    timermin=$2
+    runafter="$3 $4 $5"
+fi
+
+if [ -z "$runafter" ] ; then
+    after="l'alarme"
+else
+    after="la commande $runafter"
+fi  
+
+
+    
+# si la durée n'est pas dans le bon format
+if [[ $timermin != *:* ]] ; then
+    if [[ $timermin == *h ]] ; then # durée indiquée en heures
+        unitetimer="heure" # pour msg de sortie
+        timermin=${timermin:0:-1} # on vire le suffixe
+        timercode="$timermin:00:00" # on met dans le bon format
+    elif [[ $timermin == *s ]] ; then
+        unitetimer="seconde" # pour msg de sortie
+        timermin=${timermin:0:-1}
+        timercode="00:OO:$timermin"
+    elif [[ $timermin == *m ]] ; then
+        unitetimer="minute" # pour msg de sortie
+        timermin=${timermin:0:-1}
+        timercode="OO:$timermin:00"
+        echo $timermin
+    else # pas d'unité = en minutes
+        unitetimer="minute" # pour msg de sortie
+        timercode="00:$timermin:00"
+    fi
+fi
+
+
+if [ "$timermin" -gt "1" ] ; then
+    pluriel="s"
+else
+    pluriel=""
+fi
+
+
+
+
+gmsg Gaius -l -do "Lancement d'un compte à rebours de $timermin $unitetimer$pluriel avant $after"
+guake -n Timer -e "$PATH_SCR/countdown.sh $timercode $runafter"

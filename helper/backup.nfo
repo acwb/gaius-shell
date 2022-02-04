@@ -1,0 +1,2 @@
+Lance une sauvegarde locale/cloud des dossiers et fichiers importants et spécifiés selon l'ordinateur qui execute la commande.
+Les dossiers sont compressés dans des archives individuelles qui sont ensuite mergées dans un backup.tar.gz, uploadé sur le NAS et Dropbox.

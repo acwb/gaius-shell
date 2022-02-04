@@ -1,0 +1,26 @@
+#! /bin/bash
+
+gmsg Gaius -ask "Nom du processus à kill : "
+read -p "" ID
+echo
+ps aux | grep -v grep | grep $ID  # "grep -v grep" permet d'ignorer si contient "grep"
+
+echo
+gmsg Gaius -ask "ID du processus à kill : "
+read -p "" ID
+
+# fermeture du processus en douceur
+dmsg "Envoi de la commande kill -15 (demande de fermeture)"
+kill -15
+sleep 2
+
+# si le process est toujours là après 2 sec, on sort les plus grands moyens
+retest=$(ps aux | grep -v grep | grep "$ID")
+if [ "$retest" != "0" ] ; then
+    dmsg "Processus toujours en cours d'execution"
+    dmsg "Envoi de la commande kill -9 (fermeture forcée)"
+    kill -9 $ID
+fi
+
+gmsg Gaius -ok "Opération terminée"
+echo

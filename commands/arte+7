@@ -1,0 +1,10 @@
+#!/bin/bash
+
+WEBAPPNAME="Arte+7"
+WEBAPPURL="http://www.arte.tv/guide/fr/plus7/toutes-les-videos?sort=recent"
+
+nohup $APP_BROWSER_BIS --app=$WEBAPPURL > /dev/null 2>&1&
+gmsg Gaius -ok "Ouverture de $WEBAPPNAME dans $APP_BROWSER_BIS"
+sleep 1
+guake -t
+echo

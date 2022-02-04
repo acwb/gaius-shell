@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+CLIENTNAME=$(hostname)
+
+if [ "$CLIENTNAME" = "Solar" ]; then
+    CLIENTDESC="HP WorkStation xw4400"
+    LOCALIP="`ifconfig eth1 2>/dev/null|awk '/inet addr:/ {print $2}'|sed 's/addr://'`"
+elif [ "$CLIENTNAME" = "Gaia" ]; then
+    CLIENTDESC="HP ProBook 4330s"
+    LOCALIP="`ifconfig wlan0 2>/dev/null|awk '/inet adr:/ {print $2}'|sed 's/adr://'`"
+else
+    CLIENTDESC="inconnu"
+fi
+
+echo "$LOCALIP"

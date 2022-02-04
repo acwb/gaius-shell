@@ -1,0 +1,57 @@
+#!/bin/bash
+
+function ident_mac {
+
+    if [ "$1" == "d0:df:9a:c4:cf:08" ]; then
+        lochost="Gaia [Linux]"
+    elif [ "$1" == "d8:d3:85:7d:53:ba" ]; then
+        lochost="Sirius [Linux]"
+    elif [ "$1" == "18:3d:a2:96:11:c0" ]; then
+        lochost="Octavia [Windows]"
+    elif [ "$1" == "00:18:e7:cc:b3:8b" ]; then
+        lochost="Solar [Windows]"  
+    elif [ "$1" == "d8:3c:69:c8:13:90" ]; then
+        lochost="Wiko [Android]"
+    elif [ "$1" == "28:98:7b:d3:eb:23" ]; then
+        lochost="GalaxyTab [Android]"
+    elif [ "$1" == "d4:4b:5e:fd:ae:ba" ]; then
+        lochost="Qasar [Brother]"
+    elif [ "$1" == "78:54:2e:28:61:46" ]; then
+        lochost="Jupiter [NAS2]"
+    elif [ "$1" == "34:08:04:98:c7:b8" ]; then
+        lochost="Saturne [NAS1]"
+    elif [ "$1" == "0-0:07:cb:44:6a:25" ]; then
+        lochost= "Freebox"
+    else
+        lochost="inconnu"
+    fi
+
+}
+
+
+echo
+gmsg Gaius -l -notice "Scan des terminaux connectés au réseau local.."
+echo
+
+HOSTS=$(sudo nmap -sP -n -oG - 192.168.0.0/24 | grep "Status: Up" | awk '{print $2}')
+
+
+for host in ${HOSTS}; do
+  ip=${host}
+  mac=$(arp -an ${ip}  | awk '{print $4}')
+  if [ "$ip" == "$LOCALIP" ]; then
+    mac=$(ifconfig -a | grep 'wlan0' | awk '{print $5}')
+  fi
+  if [ -n "$ip" ] && [ -n "$mac" ]; then
+    ident_mac $mac
+    if [ "$lochost" == "inconnu" ]; then
+        echo -n -e "$ROUGE1 ♦$RESET "
+    else
+        echo -n -e "$VERT1 ♦$RESET "
+    fi
+    echo "$ip / $mac => $lochost"
+    
+  fi
+done
+echo
+gmsg Gaius -l -ok "Scan du réseau local terminé"

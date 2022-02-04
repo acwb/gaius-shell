@@ -1,0 +1,2 @@
+Récupère des infos sur le terminal connecté au réseau local via son IP.
+Utilise la commande nmap -O (nécessite sudo).

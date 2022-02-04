@@ -1,0 +1,16 @@
+#!/bin/bash
+
+
+gmsg Gaius -warn "Fix SSH Passphrase ? "
+read -t 3 -s -n 1 -p "Appuyer sur une touche pour confirmer.." key 
+if [ "$?" != "0" ] ; then
+echo
+    gmsg Gaius -l -war "Annulation.."
+else
+    echo
+    gmsg Gaius -l -do "Execution des commandes ssh-agent et ssh-add"
+    echo
+    `ssh-agent bash`
+    sleep 0.2
+    `ssh-add /home/$USER/.ssh/id_rsa`
+fi

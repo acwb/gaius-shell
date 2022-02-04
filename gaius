@@ -1,0 +1,59 @@
+#!/bin/bash
+
+CFGLOADED="0"
+
+function ginclude { # seule fonction déclarée hors des fichiers lib/*.fn
+    if [ "`cat /home/toto/bin/flags/debug.flg`" == "on" ] ; then
+        echo -e "\e[90m\e[1m Debug → \e[0m Chargement de l'include :\e[1m $1 \e[0m"
+        sleep 0.1
+    fi
+    [[ -e "/home/toto/bin/${1}" ]] && source "/home/toto/bin/$1" || { 
+        echo -e "\e[91m\e[1m ERREUR → \e[0m Fichier include \e[1m $1 \e[0m absent !"
+        exit 1;
+    }
+}
+
+# vérif / clean du fichier de config
+if egrep -q -v '^#|^[^ ]*=[^;]*' "$configfile"; then
+  echo "Nettoyage du fichier de config" >&2
+  # filtre le fichier original vers un nouveau
+  egrep '^#|^[^ ]*=[^;&]*'  "$configfile" > "$configfile_secured"
+  configfile="$configfile_secured"
+fi
+
+
+ginclude inc/loading.sh
+sleep 0.1
+
+
+
+# include
+ginclude inc/config.cfg
+ginclude inc/fonctions.sh
+
+# initialisation
+ginclude inc/init.sh
+
+# affichage du header logo & infos sys
+ginclude commands/header
+sleep 0.4
+
+
+# affichage motd/fortune
+echo
+#echo -e -n "$GRIS2 " && motd_show && echo -e -n "$RESET "
+echo -e -n "$GRIS2 " && fortune && echo -e "$RESET "
+sleep 0.3
+
+
+# chargement du script de test si flag test on
+ test_script 
+
+
+
+# affichage du message d'accueil
+welcome
+echo
+
+# and in the end ♪♫
+prompt

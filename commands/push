@@ -1,0 +1,113 @@
+#!/bin/bash
+
+echo
+
+# on reset les var
+pushtype=""
+pushdest=""
+pushtitle=""
+pushmsg=""
+pushurl=""
+pushpath=""
+
+
+if [ -n "$2" ] ; then
+    pushdest=$2
+else
+    echo -n -e "$GRIS1 →$BOLD Destination> $RESET"
+    read pushdest ;
+fi
+
+if [ -n "$3" ] ; then
+    pushtype=$3
+else
+    echo -n -e "$GRIS1 →$BOLD Type> $RESET"
+    read pushtype ;
+fi
+
+
+if [ "$pushtype" == "link" ] || [ "$pushtype" == "url" ] || [ "$pushtype" == "lien" ] ; then
+    # correction de l'éventuel alias
+    pushtype="link"
+    gmsg Gaius -l -notice "Envoi d'un lien à $pushdest"
+    echo -n -e "$GRIS1 →$BOLD URL*> $RESET"
+    read pushurl ;
+    echo -n -e "$GRIS1 →$BOLD Message> $RESET"
+    read pushtitle ;
+    pushcontent="$pushurl"
+    pushcmd=(pushbullet push $pushdest $pushtype "$pushtitle" "$pushurl")
+
+
+elif [ "$pushtype" == "note" ] || [ "$pushtype" == "msg" ] ; then
+gmsg Gaius -l -notice "Envoi d'un message à $pushdest"
+    # correction de l'éventuel alias
+    pushtype="note"
+    echo -n -e "$GRIS1 →$BOLD Titre*> $RESET"
+    read pushtitle ;
+    echo -n -e "$GRIS1 →$BOLD Message> $RESET"
+    read pushmsg ;
+    pushcmd=(pushbullet push $pushdest $pushtype "$pushtitle" "$pushmsg")
+
+elif [ "$pushtype" == "file" ] ; then
+    gmsg Gaius -l -notice "Envoi d'un fichier à $pushdest"
+    echo -n -e "$GRIS1 →$BOLD Path*> $RESET"
+    read pushpath ;
+    echo -n -e "$GRIS1 →$BOLD Desc> $RESET"
+    read pushmsg ;
+    # si il n'y a pas de racine, on part du ~
+    if [[ ! $pushpath == /* ]]; then
+        pushpath="$PATH_USER/$pushpath"
+    fi
+    pushcmd=(pushbullet push $pushdest $pushtype $pushpath "$pushmsg")
+
+# finalement le pushtype est facultatif
+elif [[ $pushtype == http* ]]; then
+
+    pushurl="$pushtype"
+    pushtype="link"
+    pushtitle=""
+    pushcmd=(pushbullet push $pushdest $pushtype "$pushtitle" "$pushurl")
+    
+
+elif [[ $pushtype == ~* ]] || [[ $pushtype == /* ]]  ; then
+
+    pushpath="$pushtype"
+    pushtype="file"
+    pushtitle=""
+    if [[ $pushpath == ~* ]]; then
+        pushpath=${pushpath:2}
+        pushpath="$PATH_USER/$pushpath"
+    fi
+    pushcmd=(pushbullet push $pushdest $pushtype $pushpath $pushtitle)
+
+
+
+else 
+    gmsg Gaius -l -error "Type de push $pushtype incorrect"
+fi
+
+
+
+# destination et type de push ok, contenu ?
+if [ -n "$pushcmd" ] ; then
+    
+    if [ "`flag debug`" == "on" ] ; then
+        echo "
+        DEBUG:
+        Type: $pushtype
+        Destination: $pushdest
+        Titre: $pushtitle
+        Message: $pushmsg
+        URL: $pushurl
+        Path: $pushpath 
+        Commande: ${pushcmd[@]}"
+        echo
+    
+        read -p "Executer la commande ? " -n 1 -r -t5 confirm
+        if [ -n "$confirm" ] ; then
+            "${pushcmd[@]}"
+        fi
+    else
+        "${pushcmd[@]}"
+    fi
+fi

@@ -1,0 +1,46 @@
+#!/bin/bash
+gmsg Gaius -l -notice "Script de rangement du dossier DOWNLOADS"
+echo
+
+gmsg Gaius -l -notice "Transferts des fichiers selon leur type"
+notify-send Gaius "Traitement du dossier Downloads"
+
+echo
+
+gmsg Gaius -l -notice "Traitement des fichiers TORRENT"
+cd /home/toto/Downloads/incoming ; find -iname "*.torrent" -type f -print0 | xargs -0 -I '{}' /usr/bin/rsync -avR "{}" /home/toto/Downloads/torrents
+
+gmsg Gaius -l -notice "Traitement des fichiers DEB"
+cd /home/toto/Downloads/incoming ; find -iname "*.deb" -type f -print0 | xargs -0 -I '{}' /usr/bin/rsync -avR "{}" /home/toto/Downloads/software
+
+gmsg Gaius -l -notice "Traitement des archives"
+cd /home/toto/Downloads/incoming ; find \( -name "*.gz" -or -name "*.tar" -or -name "*.zip" -or -name "*.7zip" -or -name "*.gzip" \) -type f -print0 | xargs -0 -I '{}' /usr/bin/rsync -avR "{}" /home/toto/Downloads/archives
+
+gmsg Gaius -l -notice "Traitement des images"
+cd /home/toto/Downloads/incoming ; find \( -name "*.png" -or -name "*.jpeg" -or -name "*.jpg" -or -name "*.gif" -or -name "*.tiff" -or -name "*.psd" \) -type f -print0 | xargs -0 -I '{}' /usr/bin/rsync -avR "{}" /home/toto/Downloads/images
+
+gmsg Gaius -l -notice "Traitement des vidéos"
+cd /home/toto/Downloads/incoming ; find \( -name "*.avi" -or -name "*.mp4" -or -name "*.flv" -or -name "*.mpeg" -or -name "*.mpg" -or -name "*.ts" -or -name "*.mov" -or -name "*.mkv" -or -name "*.3gp" \)  -type f -print0 | xargs -0 -I '{}' /usr/bin/rsync -avR "{}" /home/toto/Downloads/images
+
+gmsg Gaius -l -notice "Traitement des fichiers PDF"
+cd /home/toto/Downloads/incoming ; find -iname "*.pdf" -type f -print0 | xargs -0 -I '{}' /usr/bin/rsync -avR "{}" /home/toto/Downloads/pdf
+
+gmsg Gaius -l -notice "Traitement des autres fichiers"
+cd /home/toto/Downloads/incoming ; find -not -name "*.pdf" -not -name "*.avi" -not -name "*.mp4" -not -name "*.flv"  -not -name "*.mpeg" -not -name "*.mpg" -not -name "*.ts" -not -name "*.mov" -not -name "*.3gp" -not -name "*.mkv" -not -name "*.png" -not -name "*.jpg" -not -name "*.jpeg" -not -name "*.gif" -not -name "*.gz" -not -name "*.tar" -not -name "*.zip" -not -name "*.rar" -not -name "*.gzip" -not -name "*.7zip" -not -name "*.deb" -not -name "*.torrent" -type f -print0 | xargs -0 -I '{}' /usr/bin/rsync -avR "{}" /home/toto/Downloads/other
+
+notify-send Gaius "Traitement du dossier Downloads terminé"
+echo
+read -p ">> Purger le dossier ~/Downloads/incoming ? (o/N) " -n 1 -r
+if [[ ! $REPLY =~ ^[Oo]$ ]]
+then
+    echo
+    gmsg Gaius -l -notice "Dossier incoming laissé intact"
+fi
+if [[ $REPLY =~ ^[Oo]$ ]]
+then
+    rm -rfv /home/toto/Downloads/incoming/*
+    echo
+    gmsg Gaius -l -ok "Dossier incoming purgé !"
+fi
+echo    # (optional) move to a new line
+

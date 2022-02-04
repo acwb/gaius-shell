@@ -1,0 +1,8 @@
+#!/bin/bash
+
+WEBAPPNAME="FranceCulture"
+WEBAPPURL="http://www.franceculture.fr/player"
+WEBAPPBROWSER="google-chrome"
+
+open_webapp $WEBAPPBROWSER $WEBAPPNAME $WEBAPPURL
+echo

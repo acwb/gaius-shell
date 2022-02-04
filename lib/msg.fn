@@ -1,0 +1,296 @@
+#!/bin/bash
+
+function amsg {
+
+    if [ "`flag sound`" == "on" ] ; then
+        if [ "$1" == "msg" ] ; then
+            pathtosound="$PATH_SND/dialog-warning.oga"
+        elif [ "$1" == "bop" ] ; then
+            pathtosound="$PATH_SND/message.oga"
+        elif [ "$1" == "error" ] ; then
+            pathtosound="$PATH_SND/error.wav"
+        elif [ "$1" == "ding" ] ; then
+            pathtosound="$PATH_SND/message-new-instant.oga"
+        elif [ "$1" == "busy" ] ; then
+            pathtosound="$PATH_SND/phone-outgoing-busy.oga"
+        elif [ "$1" == "snap" ] ; then
+            pathtosound="$PATH_SND/camera-shutter.oga"
+        elif [ "$1" == "alarm" ] ; then
+            pathtosound="$PATH_SND/alarm-clock-elapsed.oga"
+        elif [ "$1" == "on" ] ; then
+            pathtosound="$PATH_SND/power-plug.oga"
+        elif [ "$1" == "off" ] ; then
+            pathtosound="$PATH_SND/power-unplug.oga"
+        elif [ "$1" == "in" ] ; then
+            pathtosound="$PATH_SND/service-login.oga"
+        elif [ "$1" == "out" ] ; then
+            pathtosound="$PATH_SND/service-logout.oga"
+        elif [ "$1" == "tuning" ] ; then
+            pathtosound="$PATH_SND/25454__freqman__violin-tuning.wav"
+        elif [ "$1" == "countdown" ] ; then
+            pathtosound="$PATH_SND/82986__corsica-s__countdown.wav"
+        elif [ "$1" == "warning" ] ; then
+            pathtosound="$PATH_SND/83343__corsica-s__warning.wav"
+        elif [ "$1" == "uku" ] ; then
+            pathtosound="$PATH_SND/110602__turkitron__ukulele-lick-80bpm.wav"
+        elif [ "$1" == "ambient" ] ; then
+            pathtosound="$PATH_SND/198416__divinux__ambientbell.wav"
+        elif [ "$1" == "button" ] ; then
+            pathtosound="$PATH_SND/212003__pegtel__button-tap-1.mp3"
+        elif [ "$1" == "ping" ] ; then
+            pathtosound="$PATH_SND/215415__unfa__ping.flac"
+        elif [ "$1" == "digital" ] ; then
+            pathtosound="$PATH_SND/244356__soneproject__digital-life-1.wav"
+        elif [ "$1" == "sorry" ] ; then
+            pathtosound="$PATH_SND/254034__jagadamba__male-voice-whispering-sorry-english.wav"
+        elif [ "$1" == "welcome" ] ; then
+            pathtosound="$PATH_SND/254391__jagadamba__male-voice-welcome.wav"
+        elif [ "$1" == "mystery" ] ; then
+            pathtosound="$PATH_SND/256099__foolboymedia__mysterypeak1.wav"
+        elif [ "$1" == "done" ] ; then
+            pathtosound="$PATH_SND/256112__nckn__pleasant-done-notification.wav"
+        elif [ "$1" == "done2" ] ; then
+            pathtosound="$PATH_SND/256113__nckn__done.wav"
+        elif [ "$1" == "completed" ] ; then
+            pathtosound="$PATH_SND/277033__headphaze__ui-completed-status-alert-notification-sfx001.wav"
+        elif [ "$1" == "levelup" ] ; then
+            pathtosound="$PATH_SND/320654__rhodesmas__level-up-02.wav"
+        elif [ "$1" == "connect" ] ; then
+            pathtosound="$PATH_SND/322897__rhodesmas__connected-01.wav"
+        elif [ "$1" == "success4" ] ; then
+            pathtosound="$PATH_SND/322929__rhodesmas__success-04.wav"
+        elif [ "$1" == "success3" ] ; then
+            pathtosound="$PATH_SND/322930__rhodesmas__success-03.wav"
+        elif [ "$1" == "incorrect" ] ; then
+            pathtosound="$PATH_SND/322931__rhodesmas__incorrect-01.wav"
+        elif [ "$1" == "coin" ] ; then
+            pathtosound="$PATH_SND/coin.mp3"
+        elif [ "$1" == "ploc" ] ; then
+            pathtosound="$PATH_SND/audio-volume-change.oga"    
+        else    
+            pathtosound="$PATH_SND/dialog-information.oga"
+        fi
+        paplay $pathtosound &
+    fi
+}
+
+
+
+function gmsg {
+
+    # le 1er paramètre est forcément le sender
+    msgsender=$1
+    
+    # si on a -l en second paramètre, on revient à la ligne après le msg
+    if [ "$2" == "-l" ] ; then
+        newline="echo"
+        # si derrière le -l on a un -n
+        if [ "$3" == "-n" ] ; then
+            msgtype=$4
+            msgtxt=$5
+            msgnotif="1"
+        elif [ "$3" == "-q" ] ; then # mode quiet sans son
+            msgtype=$4
+            msgtxt=$5
+            msgquiet="1"
+        else 
+            msgtype=$3
+            msgtxt=$4
+            msgnotif="0"
+        fi
+    # si on a pas de -l mais un -n en 2e paramètre, on ajoute l'option notif de bureau
+    elif [ "$2" == "-n" ] ; then
+        newline=""
+        msgtype=$3
+        msgtxt=$4
+        msgnotif="1"
+    elif [ "$2" == "-q" ] ; then
+        newline=""
+        msgtype=$3
+        msgtxt=$4
+        msgquiet="1"
+    # si on a ni -l ni -n, le 2e paramètre est le type de msg
+    else
+        newline=""
+        msgtype=$2
+        msgtxt=$3
+        msgnotif="0"
+    fi
+
+    
+    # couleur en fonction du type
+    if [ "$msgtype" == "-notice" ] ; then  
+        msgcolor="$BLEU1" 
+        msgsound="ploc"
+    elif [ "$msgtype" == "-warn" ] ; then 
+        msgcolor="$ROUGE2" 
+        msgsound="warning"
+    elif [ "$msgtype" == "-error" ] ; then 
+        msgcolor="$ROUGE1"
+        msgsound="error"
+    elif [ "$msgtype" == "-echec" ] ; then 
+        msgcolor="$ROUGE2"
+        msgsound="sorry"
+    elif [ "$msgtype" == "-ok" ] ; then 
+        msgcolor="$VERT1" 
+        msgsound="done2"
+    elif [ "$msgtype" == "-do" ] ; then 
+        msgcolor="$MAGENTA1" 
+        msgsound="tap"
+    elif [ "$msgtype" == "-minor" ] ; then 
+        msgcolor="$GRIS1"  
+        msgsound="tap"
+    elif [ "$msgtype" == "-ask" ] ; then 
+        msgcolor="$CYAN2"  
+        msgsound="ding"
+    elif [ "$msgtype" == "-askauto" ] ; then 
+        msgcolor="$CYAN1"  
+        msgsound="ding"
+    elif [ "$msgtype" == "-say" ] ; then 
+        msgcolor="$JAUNE1"  
+        msgsound="bop"
+    elif [ "$msgtype" == "-cmd" ] ; then 
+        msgcolor="Commande\e[1m"  
+        msgsound="tap"
+    elif [ "$msgtype" == "-none" ] ; then 
+        msgcolor="$GRIS2" 
+        msgsound=""
+    else 
+        msgcolor="" 
+        msgsound=""
+    fi
+    
+    
+    # execution de la ligne
+    
+        # si paramètre, message en mode notif desktop
+        if [ "$msgnotif" == "1" ] ; then 
+            notify-send "${msgsender}:" "${msgtxt}"
+        fi
+
+        # message en mode console
+        echo -n -e "$msgcolor $BOLD$msgsender → $RESET $msgtxt" 
+        $newline
+        if [ "$msgsound" != "" ] && [ "$msgquiet" != "1" ] ; then 
+            amsg $msgsound
+        fi
+}
+
+
+
+function dmsg {
+
+    
+    if [ "$1" == "-f" ] || [ "$1" == "-p" ]  ; then # si on précise le paramètre pour forcer
+        debugmsg="$2"
+    else
+        debugmsg="$1"
+    fi
+    
+    if [ "`flag debug`" == "on" ] ; then
+        echo -e "$GRIS1$BOLD Debug → $RESET $debugmsg"
+        if [ "$1" == "-p" ] ; then # si param pour marquer une pause
+            for (( i=5; i>0; i--)); do
+                printf "\r$GRIS1$BOLD Debug → $RESET Poursuite dans $i secondes.  Presser une touche pour passer"
+                read -s -n 1 -t 1 key
+                if [ $? -eq 0 ]
+                then
+                    break
+                fi
+            done
+            echo
+        else
+            sleep 0.2
+        fi
+    fi
+}
+
+
+function fmsg {
+
+    if [ "$1" == "-f" ] ; then # si on précise le paramètre pour forcer
+        name="$2"
+        value="$3"
+    else
+        name="$1"
+        value="$2"
+    fi
+    
+    # les messages flag ne sont affichés qu'en mode débug ou si commande forcée
+    if [ "`flag debug`" == "on" ] || [ "$1" != "-f" ] ; then
+        etat="`flag $name`"
+        echo -e "$GRIS1$BOLD flag:$1 [$etat] → $RESET$GRIS2 $2"
+    fi
+}
+
+
+
+function hmsg {
+
+force=""
+pause=""
+sender=""
+helpmsg=""
+   
+ # pour chacun de arguments donnés
+    for i in "$@" ; do
+    
+        if [[ $i == "-f" ]] ; then
+            force=1 # même si flag help off, utile pour la commande help
+        fi
+        
+        if [[ $i == "-p" ]] ; then
+            pause=1
+        fi
+        
+        if [[ $i == "\""* ]] ; then
+            helpmsg=${i#"|"}
+            helpmsg=${i%"|"}
+        
+        else
+            sender=$i
+        fi
+    done
+    
+    if [ -z "$helpmsg" ]; then
+        if test -f "$PATH_HLP/$sender.nfo"; then 
+            helpmsg=$(cat $PATH_HLP/$sender.nfo)
+        else
+            helpmsg="(TODO) La commande $sender n'a pas encore de description." 
+        fi
+    fi
+    
+    if [ "`flag help`" == "on" ] || [ "$force" == 1 ] ; then
+        echo && echo -e "$GRIS1$BOLD $sender $CYAN2☛ $RESET$GRIS1 $helpmsg $RESET"
+        if [ "$pause" == 1 ] ; then  # si param pour marquer une pause
+            for (( i=5; i>0; i--)); do
+                printf "\r$GRIS1$BOLD Helper $CYAN2☛ $RESET$GRIS1 Poursuite dans $i secondes.  Presser une touche pour passer$RESET"
+                read -s -n 1 -t 1 key
+                if [ $? -eq 0 ]
+                then
+                    break
+                fi
+            done
+        fi
+    fi
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

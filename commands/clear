@@ -1,0 +1,11 @@
+#!/bin/bash
+
+clear
+
+# affichage du header logo & infos sys
+source /home/toto/bin/commands/header
+sleep 0.1
+echo
+
+# and in the end
+prompt

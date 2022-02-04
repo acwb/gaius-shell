@@ -1,0 +1,38 @@
+#!/bin/bash
+
+pathtocount=$PATH_FLG/*
+
+# on récupère le nombre de fichiers
+numfiles=($pathtocount)
+numfiles=${#numfiles[@]}
+
+gmsg Gaius -l -notice "$numfiles flags enregistrés dans le système :"
+echo
+
+# on sort le contenu de chaque fichier
+for f in $pathtocount; do
+
+    flagname=${f##*/}
+    flagname=${flagname%.flg}
+    read -r firstline<$PATH_FLG/$flagname.flg
+
+    if [ "$firstline" == "on" ]; then
+        colorflag="$VERT2"
+        symbflag="☒"
+    fi
+    if [ "$firstline" == "off" ]; then
+        colorflag="$ROUGE2"
+        symbflag="☐"
+    fi
+
+    # on affiche le nom du flag et son état
+    echo -e -n " * $flagname → $colorflag $firstline$RESET"
+
+    # on va chercher le helper correspondant au flag
+    if [ -f "$PATH_HLP/flags/$flagname.flg.nfo" ]; then
+        read -r firstline<$PATH_HLP/flags/$flagname.flg.nfo
+        echo -n -e "$GRIS1 ($firstline)$RESET"
+    fi
+    echo
+    
+done

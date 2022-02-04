@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+   #echo -n "h:m ou +m : "
+   # read timer
+   # echo
+   timer="+120"
+    shutdown -h $timer &    
+    gmsg Gaius -ok "Extinction dans $timer minutes, bonne nuit"
+    
+  

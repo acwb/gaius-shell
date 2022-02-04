@@ -1,0 +1,27 @@
+#!/bin/bash
+
+
+if [ -n "$2" ] ; then
+    iptocheck="$2"
+else
+    gmsg Gaius -notice "Adresse IP à identifier ?"
+    echo -n " "
+    read iptocheck
+fi
+
+if [ -n "iptocheck" ] ; then
+
+    gmsg Gaius -l -do "Identification de $iptocheck"
+    
+    sudo nmap -sS -P0 -sV -O $iptocheck
+
+    gmsg Gaius -l -n -notice "Opération terminée"
+
+
+else 
+    gmsg Gaius -l -n -notice "Opération annulée"
+fi
+
+        
+
+    

@@ -1,0 +1,23 @@
+wlan0     Scan completed :
+          Cell 01 - Address: XX:XX:XX:XX:XX:XX
+                    Channel:12
+                    Frequency:2.467 GHz (Channel 12)
+                    Quality=65/70  Signal level=-45 dBm  
+                    Encryption key:on
+                    ESSID:"XXXXXXXX"
+                    Bit Rates:1 Mb/s; 2 Mb/s; 5.5 Mb/s; 11 Mb/s
+                    Bit Rates:6 Mb/s; 9 Mb/s; 12 Mb/s; 18 Mb/s; 24 Mb/s
+                              36 Mb/s; 48 Mb/s; 54 Mb/s
+                    Mode:Master
+                    Extra:tsf=000000148d2ab818
+                    Extra: Last beacon: 63856ms ago
+                    IE: Unknown: 00054D6F726173
+                    IE: Unknown: 010482848B96
+                    IE: Unknown: 03010C
+                    IE: Unknown: 2A0104
+                    IE: Unknown: 32080C1218243048606C
+                    IE: WPA Version 1
+                        Group Cipher : TKIP
+                        Pairwise Ciphers (2) : TKIP CCMP
+                        Authentication Suites (1) : PSK
+

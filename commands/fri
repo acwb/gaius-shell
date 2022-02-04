@@ -1,0 +1,8 @@
+#!/bin/bash
+
+WEBAPPNAME="FranceInter"
+WEBAPPURL="http://www.franceinter.fr/player"
+WEBAPPBROWSER="google-chrome"
+
+open_webapp $WEBAPPBROWSER $WEBAPPNAME $WEBAPPURL
+echo

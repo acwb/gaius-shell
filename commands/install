@@ -1,0 +1,24 @@
+#!/bin/bash
+
+echo
+
+# le(s) paramètre(s) est directement donné, on le(s) met de coté
+if [ -n "$2" ] ; then
+    paquet=$2
+
+# sinon on le(s) demande
+else
+    gmsg Gaius -notice "Paquet à installer ?"
+    echo -n " " 
+    read paquet
+fi  
+
+# si tout est renseigné et prêt
+if [ -n "$paquet" ] ; then
+    gmsg Gaius -l -do "Lancement de l'installation de $paquet"
+    echo
+    sudo apt-get install $paquet -y # optin -y pour zapper les prompts
+# sinon on annule
+else 
+    gmsg Gaius -l -notice "Opération annulée"
+fi

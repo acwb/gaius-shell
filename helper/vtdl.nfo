@@ -1,0 +1,5 @@
+Téléchargement des vidéos Youtube enregistré dans le fichier $PATH_TMP/todl via la commande <tdl>
+Pour télécharger une vidéo unique, utiliser la commande <vdl>
+
+Cette commande fait appel au script <youtube-dl> et execute la ligne :
+youtube-dl --no-playlist --ignore-errors --write-description --no-overwrites -o "/home/toto/Downloads/stream/yt-dl/%(title)s/%(title)s_%(width)sx%(height)s.%(id)s.%(ext)s" --batch-file $PATH_TMP/todl.txt

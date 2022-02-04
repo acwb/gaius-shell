@@ -1,0 +1,257 @@
+#!/bin/bash
+
+
+
+# si on veut la liste des réseaux
+if [ "$2" == "scan" ] ; then
+
+        echo
+        gmsg Gaius -l -do "Détection des réseaux WIFI à portée.."
+        echo 
+
+        #killall -9 wpa_supplicant
+        iwlist wlan0 scanning > ~/bin/temp/wifiscan #save scan results to a temp file
+        scan_ok=$(grep "wlan" ~/bin/temp/wifiscan) #check if the scanning was ok with wlan0
+        if [ -z "$scan_ok" ]; then
+            #killall -9 wpa_supplicant
+            iwlist wlan0-1 scanning > ~/bin/temp/wifiscan
+        fi 
+        scan_ok=$(grep "wlan" ~/bin/temp/wifiscan) #check if the scanning was ok
+        if [ -z "$scan_ok" ]; then #if scan was not ok, finish the script
+            echo -n "
+        WIFI scanning failed.
+
+        "
+            exit
+        fi
+        if [ -f ~/bin/temp/ssids ]; then
+            rm ~/bin/temp/ssids 
+        fi
+        n_results=$(grep -c "ESSID:" ~/bin/temp/wifiscan) #save number of scanned cell
+        i=1
+        while [ "$i" -le "$n_results" ]; do
+                if [ $i -lt 10 ]; then
+                        cell=$(echo "Cell 0$i - Address:")
+                else
+                        cell=$(echo "Cell $i - Address:")
+                fi
+                j=`expr $i + 1`
+                if [ $j -lt 10 ]; then
+                        nextcell=$(echo "Cell 0$j - Address:")
+                else
+                        nextcell=$(echo "Cell $j - Address:")
+                fi
+                awk -v v1="$cell" '$0 ~ v1 {p=1}p' ~/bin/temp/wifiscan | awk -v v2="$nextcell" '$0 ~ v2 {exit}1' > ~/bin/temp/onecell #store only one cell info in a temp file
+
+                ##################################################
+                ## Uncomment following line to show mac address ##
+
+                #oneaddress=$(grep " Address:" ~/bin/temp/onecell | awk '{print $5}')
+
+                onessid=$(grep "ESSID:" ~/bin/temp/onecell | awk '{ sub(/^[ \t]+/, ""); print }' | awk '{gsub("ESSID:", "");print}')
+                oneencryption=$(grep "Encryption key:" ~/bin/temp/onecell | awk '{ sub(/^[ \t]+/, ""); print }' | awk '{gsub("Encryption key:on", "(fermé)");print}' | awk '{gsub("Encryption key:off", "(ouvert)  ");print}')
+                onepower=$(grep "Quality=" ~/bin/temp/onecell | awk '{ sub(/^[ \t]+/, ""); print }' | awk '{gsub("Quality=", "");print}' | awk -F '/70' '{print $1}')
+                onepower=$(awk -v v3=$onepower 'BEGIN{ print v3 * 10 / 7}')
+                onepower=${onepower%.*}
+                onepower="(Signal: $onepower%)"
+                if [ -n "$oneaddress" ]; then                                                                                                            
+                        echo "$onessid  $oneaddress $oneencryption $onepower" >> ~/bin/temp/ssids                                                              
+                else                                                                                                                                     
+                        echo "$onessid  $oneencryption $onepower" >> ~/bin/temp/ssids                                                                          
+                fi
+                i=`expr $i + 1`
+
+
+        done
+        rm ~/bin/temp/onecell
+        awk '{printf("%5d: %s\n", NR,$0)}' ~/bin/temp/ssids > ~/bin/temp/sec_ssids #add numbers at beginning of line
+        grep ESSID ~/bin/temp/wifiscan | awk '{ sub(/^[ \t]+/, ""); print }' | awk '{printf("%5d : %s\n", NR,$0)}' | awk '{gsub("ESSID:", "");print}' > ~/bin/temp/ssids #generate file with only numbers and names
+
+        cat ~/bin/temp/sec_ssids #show ssids list
+
+       
+
+        #echo -n "Enter the numeric option for your selected network: "
+        #read nsel
+        pattern=$(echo " $nsel : ")
+        wifissid=$(grep "$pattern" ~/bin/temp/ssids)
+        wifissid=$(echo "$wifissid" | awk -v pat="$pattern" '{gsub(pat, "");print}' | awk '{ sub(/^[ \t]+/, ""); print }')
+        wifissid=${wifissid:1:`expr ${#wifissid} - 2`}  #several commands to get clean name of ssid
+
+
+        #if [ $nsel -lt 10 ]; then
+        #    cell=$(echo "Cell 0$nsel - Address:")
+        #else
+        #    cell=$(echo "Cell $nsel - Address:")
+        #fi
+        #nextsel=`expr $nsel + 1`
+        #if [ $nextsel -lt 10 ]; then
+        #    nextcell=$(echo "Cell 0$nextsel - Address:")
+        #else
+        #    nextcell=$(echo "Cell $nextsel - Address:")
+        #fi
+        awk -v v1="$cell" '$0 ~ v1 {p=1}p' ~/bin/temp/wifiscan | awk -v v2="$nextcell" '$0 ~ v2 {exit}1' > ~/bin/temp/cellinfo0 #store only the selected cell #info in a temp file
+        grep -v ESSID ~/bin/temp/cellinfo0 > ~/bin/temp/cellinfo # delete ESSID line to avoid later grep mistakes
+        #rm ~/bin/temp/cellinfo0
+        wifichannel=$(grep " Channel:" ~/bin/temp/cellinfo)
+        wifichannel=$(echo "$wifichannel" | awk '{gsub(" Channel:", "");print}' | awk '{ sub(/^[ \t]+/, ""); print }') #get clean wifi channel
+        wifimode=$(grep " WEP" ~/bin/temp/cellinfo) #check if encryption mode is WEP
+        if [ -n "$wifimode" ]; then   #check if $wifimode is not an empty string
+            wifimode="wep"
+        else
+            wifimode=$(grep "WPA2 " ~/bin/temp/cellinfo) #check if encryption mode is WPA2
+            if [ -n "$wifimode" ]; then
+                wifimode="psk2"
+            else
+                wifimode=$(grep "WPA " ~/bin/temp/cellinfo) #check if encryption mode is WPA
+                if [ -n "$wifimode" ]; then
+                    wifimode="psk"
+                else
+                    wifimode="none"
+                fi
+            fi
+        fi
+        encryp_on=$(grep " Encryption key:on" ~/bin/temp/cellinfo)
+        if [[ "$wifimode" == "none" && -n "$encryp_on" ]]; then
+            echo " "
+            echo "Impossible to detect wifi security mode automatically."
+            echo "Please specify the seurity mode of the network."
+            echo " 1: WPA"
+            echo " 2: WPA2"
+            echo " 3: WEP"
+            echo " 4: Undefined"
+            echo -n "Enter the numeric option for your security mode: "
+            read sel_mode
+            case "$sel_mode" in
+                1)
+                    wifimode="psk"
+                    ;;
+                2)
+                    wifimode="psk2"
+                    ;;
+                3)
+                    wifimode="wep"
+                    ;;
+                4)
+                    wifimode="none"
+                    ;;
+            esac
+        fi
+
+        rm ~/bin/temp/cellinfo
+        rm ~/bin/temp/ssids
+        rm ~/bin/temp/sec_ssids
+        #rm ~/bin/temp/wifiscan
+        #write results in the wireless config file and reset wifi interface
+        #uci set wireless.radio0.channel=$wifichannel
+        #uci set wireless.wificlient.ssid="$wifissid"
+        #uci set wireless.wificlient.encryption=$wifimode
+        #uci set wireless.wificlient.key=$wifipass
+        #uci commit wireless
+        #echo -n "Trying to connect to WIFI network.
+        #(Wait a few seconds and check status with: iwconfig )"
+
+
+
+     if grep --quiet 'ESSID:"XXXXX"' ~/bin/temp/wifiscan; then
+            echo
+            gmsg Gaius -l -notice "Réseau domestique détecté : XXXXX - Appuyer sur une touche pour s'y connecter."
+            
+            read -t 3 -s -n 1 -p " " key 
+            if [ "$?" -eq "0" ] ; then
+            
+               gmsg Gaius -l -do "Connexion automatique en cours.."
+                             
+                b_ssid="XXXXXX"
+                pass="XXXXXXXXXXX"
+            
+
+                output=$(nmcli device wifi connect "$b_ssid"    password "$pass" iface wlan0 --timeout 10) # Tries to connect
+                wget -q --tries=5 --timeout=5 --spider http://google.com &> /dev/null # Is connected to Internet?
+                if [[ $? -eq 0 ]]; then
+                    #echo "You're connected." # Is connected to Internet
+                    gmsg Gaius -l -n -ok "Connexion réussie au wifi $b_ssid"
+                    #exit 0
+                    else
+                    gmsg Gaius -l -error "Erreur de connexion : $output"
+                    #echo "Error. $output" # Anything goes wrong
+                    #exit 1
+                fi
+            fi
+        fi
+        
+        
+else
+
+
+    ## Restores the screen when the program exits.
+    #trap "tput rmcup; exit"  SIGHUP SIGINT SIGTERM
+
+    ## Saves the screen contents.
+    #tput smcup
+
+    ## Clears the screen.
+    #clear
+
+    ## Loop through available interfaces.
+    while read interface; do                    # While reads a line of the output
+        i=$((i+1))                                  # Only God knows what does this (view note 1).
+        type=$(cut -f2 -d ' ' <<< $interface)       # Saves the interface type to check if is wifi.
+        status=$(cut -f3 -d ' ' <<< $interface)     # Saves the status of the current interface.
+        interface=$(cut -f1 -d ' ' <<< $interface)  # Selects the INTEFACE field of the output.
+        if [[ "$type" == "802-11-wireless" ]]; then # If is a WiFi interface then:
+          interfaces[$i]=$interface                     # Adds the current interface to an array.
+          echo "$i: $interface ($status)"               # Prints the name of current interface.
+        fi                                          # Ends the if conditional
+    done < <(nmcli device | tail -n +2)         # Redirects the output of the command nmcli device to the loop.
+
+    ## If there is only one interface
+    if [[ "$i" == "2" ]]; then
+        iface=1 # Selected interface is the only one
+    
+    else
+        ## Prompts the user for the interface to use.
+        read -p "Sélectionner l'interface : " iface
+    fi
+
+    ## If the entered number is valid then...
+    if [[ "$iface" -le $i ]]; then
+
+        if [ "$2" == "connect" ] ; then
+             b_ssid="$3"
+             
+             if [ "$b_ssid" == "XXXXXXXX" ] ; then
+                w_pass="XXXXXXXX"
+             elif [ "$b_ssid" == "XXXXXXXX-CPL" ] ; then
+                w_pass="XXXXXXXX"
+             else
+               read -p -s "Clé wifi: " w_pass # Prompts the user for the password
+             fi
+
+        else
+             read -p "SSID du réseau: " b_ssid # Prompts the user for the ESSID/BSSID
+             if [ -z "$b_ssid" ] ; then
+                exit
+            fi
+             read -p -s "Clé wifi: " w_pass # Prompts the user for the password
+        fi
+        
+
+        output=$(nmcli device wifi connect "$b_ssid"    password "$w_pass" iface wlan0 --timeout 10) # Tries to connect
+        wget -q --tries=5 --timeout=5 --spider http://google.com &> /dev/null # Is connected to Internet?
+        if [[ $? -eq 0 ]]; then
+                #echo "You're connected." # Is connected to Internet
+                gmsg Gaius -l -n -ok "Connexion réussie au wifi $b_ssid"
+                #exit 0
+        else
+                gmsg Gaius -l -error "Erreur de connexion : $output"
+                #echo "Error. $output" # Anything goes wrong
+                #exit 1
+        fi
+    else
+        gmsg Gaius -l -error "Interface invalide."
+        #echo "Invalid interface entered. Exiting..."
+        #exit 2
+    fi
+
+fi

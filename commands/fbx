@@ -1,0 +1,207 @@
+#!/bin/sh
+
+source $PATH_SCR/freebox
+
+# This is a free shell script under GNU GPL version 3.0
+# Script bash permettant de redemarrer la Freebox boitiers ADSL & HD
+# Par arpalord d'apres une idee de Kysic (Forum Ubuntu-fr)
+# Code telecommande accessible dans le menu
+# "Informations generales" de la freebox hd
+
+CODE_FREEBOX="61592318"
+ID_BOITIER=1
+HOST="hd${ID_BOITIER}.freebox.fr"
+
+# Simule un appui sur la touche $1
+# Simule un appui long si $2 vaut "long"
+# Liste keys :
+# power : la touche rouge on/off 
+# list : la touche d'affichage de la liste des chaines entre power et tv 
+# tv : la touche verte TV de commutation peritel. 
+# 0 a 9 : les touches 0 a 9 
+# back : la touche jaune en dessous du 7 
+# swap : la touche en dessous du 9 
+# info, mail, help, pip : les touches bleues a droite des numŽros de chaine 
+# epg, media, options : fonctionnalites "secondaires" de ces memes touches 
+# vol_inc, vol_dec : volume+ et volume- 
+# prgm_inc, prgm_dec : program+ et program- 
+# ok : touche OK 
+# up, right, down, left : les touches directionnelles entourant le OK 
+# mute : la touche de mise en sourdine 
+# home : la touche free 
+# rec : la touche d'enregistrement 
+# bwd : la touche de retour en arriere (<<) 
+# prev : la touche "precedent" (|<<) 
+# play : la touche lecture/pause 
+# fwd : la touche d'avance rapide (>>) 
+# next : la touche "suivant" (>>|) 
+# red : le bouton rouge (B) 
+# green : le bouton vert (A) 
+# yellow : le bouton jaune (Y) 
+# blue : le bouton bleu (X) 
+
+
+# Forge et lancement de la commande wget
+appui() {
+
+ if [ "$#" -eq 1 ]
+    then 
+    isLong=false
+ else
+    if [ "$#" -eq 2 ]
+    then
+        isLong=true
+    else
+        echo "Usage : appui <key> [long]"
+        return 2
+    fi
+ fi
+ sleep 1 && wget -q -O /dev/null "http://${HOST}/pub/remote_control?code=${CODE_FREEBOX}&key=${1}&long=${isLong}" 
+ echo -n -e "$GRIS1 [${1}] $RESET" 
+}
+
+# Relance la Box ADSL
+rebootADSL(){
+    gmsg Freebox -l -do "Reboot de la box ADSL : "
+    appui down && appui down && appui right && appui ok
+    echo "=> Parametres"
+    sleep 3
+    appui right && appui right && appui ok 
+    echo "=> Reseau"
+    sleep 3
+    appui down && appui ok
+    echo "=> Envoi de l'instruction de reboot.."  
+}
+
+
+# Relance la Box TV après ADSL
+rebootpostADSL(){
+    gmsg Freebox -l -do "Reboot de la box TV (après reboot ADSL) :"
+    appui home && appui ok
+    echo "=> Parametres"
+    sleep 3
+    appui left && appui ok
+    echo "=> Infos TV"
+    sleep 3
+    appui down && appui ok
+    echo "=> Envoi de l'instruction de reboot de la box TV.."
+}
+
+# Relance de la Box TV seule
+rebootTV(){
+    gmsg Freebox -l -do "Reboot de la box TV : "
+    appui down && appui down && appui right && appui ok
+    echo "=> Parametres"
+    sleep 2
+    appui right && appui ok
+    echo "=> Infos TV"
+    sleep 2
+    appui down && appui ok
+    echo "=> Envoi de l'instruction de reboot de la box TV.."
+}
+
+standbyTVoff(){ 
+    gmsg Freebox -notice "Mise en veille de la box TV : " 
+    appui power
+    echo
+}
+standbyTVon(){ 
+    gmsg Freebox -notice "Sortie de veille de la box TV : " 
+    appui power
+    echo
+}
+
+case $2 in
+    reboot)
+        gmsg Gaia -l -notice "Lancement d'un reboot de la Freebox et Box TV.."
+        standbyTVon
+        sleep 3
+        rebootADSL
+        gmsg Gaia -l -notice "Reboot de la Freebox en cours, patienter 60 secondes."
+        sleep 60
+        rebootpostADSL
+        gmsg Gaia -l -ok "Reboot Freebox + BoxTV effectué."
+        ;;
+    rebootpostadsl)
+        gmsg Gaia -l -notice "Lancement d'un reboot Box TV après un reboot Freebox.."
+        rebootpostADSL;;
+    rebootadsl)
+        gmsg Gaia -l -notice "Lancement d'un reboot de la Freebox seule.."
+        standbyTVon
+        sleep 5
+        rebootADSL;;
+    reboottv)
+        gmsg Gaia -l -notice "Lancement d'un reboot de la Box TV seule.."
+        standbyTVon
+        sleep 5
+        rebootTV
+        standbyTVoff;;
+    tvoff)
+        standbyTVoff;;
+    tvon)
+        standbyTVon;;
+    status)
+        gmsg Freebox -minor && get_status
+        gmsg Freebox -minor && get_phone_status
+        ;;
+    uptime)
+        gmsg Freebox -minor && get_uptime
+        ;;
+    atm)
+        gmsg Freebox -minor && get_atm_bandwidth
+        ;;
+    attenuation)
+        gmsg Freebox -minor && get_attenuation
+        ;;
+    snr)
+        gmsg Freebox -minor && get_SNR_margin
+        ;;
+    fec)
+        gmsg Freebox -minor && get_fec
+        ;;
+    hec)
+        gmsg Freebox -minor && get_hec
+        ;;
+    crc)
+        gmsg Freebox -minor && get_crc
+        ;;
+    rates)
+        gmsg Freebox -minor && get_rates
+        ;;
+    infos|info)
+        get_allinfos
+        echo
+        gmsg Gaia -l -notice "Fin du fichier $PATH_TMP/fbx_info.txt"
+        gmsg Gaia -l -notice "Filtrer des infos avec un des paramètres : status, uptime, atm, attenuation, snr, fec, hec, crc, rates"
+        ;;
+    k|key|telecommande)
+        gmsg Gaia -l -notice "Mode télécommande : left(q), right(d), up(z), down(s), ok(o), home(h), power(p)"
+        while [ "$fbxhdcmd" != "quit" ] ; do
+            echo
+            echo -n -e "$GRIS1 →$BOLD FreeboxTV> $RESET"
+            read fbxhdcmd ;
+            case $fbxhdcmd in
+                gauche|left|q) appui left ;;
+                droite|right|d) appui right ;;
+                haut|up|z) appui up ;;
+                bas|down|s) appui down ;;
+                o|ok) appui ok ;;
+                h|home) appui home;;
+                p|power) appui power;;
+                restart)
+                    gmsg Gaia -l -notice "Lancement d'un reboot de la Box TV seule.."
+                    standbyTVon
+                    sleep 5
+                    rebootTV
+                    standbyTVoff;;
+                off)
+                    standbyTVoff;;
+                on)
+                    standbyTVon;;
+                *) gmsg Gaia -l -notice "Mode télécommande : left(q), right(d), up(z), down(s), ok(o), home(h), power(p) - on, off, restart";;
+            esac
+        done
+        ;;   
+    *)
+        gmsg Gaia -l -notice "Paramètres disponibles: key, reboot, rebootadsl, reboottv, rebootpostadsl, tvoff, tvon, infos, status, uptime, atm, attenuation, snr, fec, hec, crc, rates"
+esac

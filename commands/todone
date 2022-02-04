@@ -1,0 +1,22 @@
+#!/bin/bash
+
+params="$@" # on récupère l'input complet
+
+# si il contient que la commande = pas d'argument
+if [ "$params" == "todone" ] ; then
+    gmsg Gaius -l -do "Le fichier TODO contient :"
+    echo
+    cat $PATH_TMP/todo.txt
+  
+# sinon c'est pour une suppression de ligne
+else
+    idline=${params:7}
+    echo
+    gmsg Gaius -warn "Supprimer la/les ligne(s) contenant $idline [*] ?"
+    read -p " " -n 1 -r confirm
+    if [ -n "$confirm" ]; then
+        echo
+        gmsg Gaius -l -ok "Ligne supprimée du fichier"
+        sed -i "/$idline/d" $PATH_TMP/todo.txt
+    fi
+fi

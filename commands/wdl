@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo
+echo -n "URL du site à aspirer : "
+read dlurl
+wget -rkp -l3 -np -nH -P $PATH_WDLD/ $dlurl
+gmsg Gaius -ok "Téléchargement de $dlurl terminé"

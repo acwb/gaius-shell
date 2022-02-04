@@ -1,0 +1,7 @@
+#!/bin/bash
+
+guake --rename-tab=- 
+clear
+gmsg Gaius -l -notice "See you master."
+echo 
+gbreak

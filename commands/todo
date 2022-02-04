@@ -1,0 +1,5 @@
+#!/bin/bash
+
+params=$@
+params=${params:5}
+bash $PATH_SCR/todo/todo.sh -d $PATH_CFG/todo.cfg "$params"

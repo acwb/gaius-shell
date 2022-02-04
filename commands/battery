@@ -1,0 +1,4 @@
+#!/bin/bash
+
+
+source $PATH_SCR/battery $1 $2 $3 $4 

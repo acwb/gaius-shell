@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# script de "setup" (onglet sur guake terminal)
+
+sleep 10 && guake
+sleep 2
+guake --rename-tab="Solar" &
+sleep 1 &&
+guake --new-tab=2 --rename-tab="Gaius" --execute-command="gaius" 
+guake -f 

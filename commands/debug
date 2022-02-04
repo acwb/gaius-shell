@@ -1,0 +1,8 @@
+flagstate=$(cat $PATH_FLG/debug.flg)
+    if [ "$flagstate" == "on" ]; then
+        gmsg Gaius -l -ok "Changement du flag debug : ON vers OFF"
+        make_flag -v debug "off"
+    elif [ "$flagstate" == "off" ]; then
+        gmsg Gaius -l -ok "Changement du flag debug : OFF vers ON"
+        make_flag -v debug "on"
+    fi

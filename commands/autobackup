@@ -1,0 +1,78 @@
+#!/bin/bash
+### destination archive sauvegarde (non supprimé dans le cas du shell)
+BACKUP=$PATH_USER/Backups/Gaius
+
+SCPD="/mnt/HD/HD_b2/Backup/Gaius/"
+SCPU="toto"
+SCPS="192.168.0.200"
+SCPP="22"
+
+### Binaries ###
+TAR="$(which tar)"
+GZIP="$(which gzip)"
+FTP="$(which ftp)"
+
+BACKUPTIME=$(date +%Y.%m.%d-%Hh%M)
+BACKUPTIMESTAMP=$(date +%s)
+
+ARCHIVE=gaius-backup-$BACKUPTIME.tar
+ARCHIVED=Bashup/$BACKUPTIME
+
+cd $PATH_USER
+
+gmsg Gaius -l -n -notice "Lancement d'une sauvegarde du shell.."
+
+
+
+# CREATION DOSSIER TEMPORAIRES
+mkdir -p $BACKUP
+mkdir -p $BACKUP/$BACKUPTIME
+
+# COMPRESSION DES DOSSIERS A SAUVEGARDER
+
+if [ "$1" != "-auto" ];then
+    gmsg Gaius -l -do "Compression de ~/bin.."
+fi
+$TAR -cf $BACKUP/$ARCHIVE $DIR_BIN
+
+# CHECK REUSSITE CREATION ARCHIVE ET CONFIRM
+if [[ $? != 0 ]]; then
+  gmsg Gaius -l -n -error "Erreur lors de la création de l'archive $ARCHIVE" ;
+  exit 1
+else
+    if [ "$1" != "-auto" ];then
+        gmsg Gaius -l -ok "Archive $ARCHIVE prête"
+    fi
+fi
+
+# TRANSFERT vers NAS   [ si paramètre -dbx absent)
+gmsg Gaius -l -do "Transfert du backup vers$BOLD $SCPU@$SCPS$RESET:$SCPD.. " ;
+echo -n -e "$GRIS2" && scp -P $SCPP -r $BACKUP/$ARCHIVE  $SCPU@$SCPS:$SCPD
+echo -n -e "$RESET"
+sleep 0.2
+
+# TRANSFERT VERS DROPBOX 
+gmsg Gaius -l -do "Transfert du backup vers$BOLD totoclectic@dropbox$RESET:/Backups/Gaius/$RESET.." 
+echo -n -e "$GRIS2" && bash $PATH_SCR/dropbox/dropbox_uploader.sh -p upload $BACKUP/$ARCHIVE Backups/Gaius/$ARCHIVE 
+echo -n -e "$RESET"
+sleep 0.3
+
+
+# CHECK REUSSITE TRANSFERT ET CONFIRM
+if [[ $? != 0 ]]; then
+  gmsg Gaius -l -n -error "Erreur lors de la sauvegarde du shell" ;
+  exit 1
+else
+    # date du backup
+    gmsg Gaius -l -do "Synchronisation de la date de dernière mise-à-jour.." 
+    make_flag lastbackup-gaius $BACKUPTIMESTAMP
+    echo $BACKUPTIMESTAMP > $BACKUP/lastupload.txt
+    dmsg "Suppression du fichier distant dropbox:Backups/Gaius/lastupload.txt"
+    echo -n -e "$GRIS2" && bash $PATH_SCR/dropbox/dropbox_uploader.sh -q  delete Backups/Gaius/lastupload.txt 
+    sleep 0.1
+    dmsg "Upload sur dropbox du fichier lastupload.txt mis à jour"
+    echo -n -e "$GRIS2" && bash $PATH_SCR/dropbox/dropbox_uploader.sh -q upload $BACKUP/lastupload.txt Backups/Gaius/lastupload.txt
+    gmsg Gaius -l -n -ok "Transferts terminées, fichiers du shell sauvegardés sur NAS + DropBox" 
+    amsg snap
+    rm -rf $BACKUP/$BACKUPTIME
+fi

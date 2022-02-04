@@ -1,0 +1,4 @@
+
+gmsg Gaius -do "Génération d'un mot de passe aléatoire : $BOLD"
+</dev/urandom tr -dc '12345!@#$%qwertQWERTasdfgASDFGzxcvbZXCVB' | head -c10; echo ""
+echo -e "$RESET"

@@ -1,0 +1,21 @@
+#!/bin/bash
+
+
+function test_script {
+
+    if [ "`flag test`" == "on" ] ; then
+        fmsg test "Execution du script de test :"
+        echo -n " "
+        source $PATH_CMD/test
+        echo -e "$RESET"
+    else
+        dmsg "Exécution auto du script de test désactivé"
+    fi  
+}
+
+# pour commande google
+function encode { echo -n $@ | perl -pe's/([^-_.~A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg'; }
+
+function timestamp {
+  date +"%S"
+}

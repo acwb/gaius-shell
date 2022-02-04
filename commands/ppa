@@ -1,0 +1,57 @@
+#!/bin/bash
+
+
+
+# le(s) paramètre(s) est directement donné, on le(s) met de coté
+if [ -n "$2" ] ; then
+    reposit=$2
+
+# sinon on le(s) demande
+else
+    gmsg Gaius -notice "PPA à ajouter ?"
+    echo -n " " 
+    read reposit
+fi  
+
+if [ -n "$reposit" ]; then
+
+    if [[ $reposit != \ppa:* ]] ; then
+        dmsg "$reposit ne comporte pas ppa:"
+        reposit="ppa:$reposit"
+    fi
+
+    # si tout est renseigné et prêt
+    if [ -n "$reposit" ] ; then
+        gmsg Gaius -l -do "Ajout du $reposit"
+        echo
+        sudo add-apt-repository $reposit -y
+        echo
+
+        for (( i=3; i>0; i--)); do
+            update="ok" # action par defaut
+            printf "\rMise à jour des paquets dans $i secondes.  Presser une touche pour passer"
+            read -s -n 1 -t 1 key
+            if [ $? -eq 0 ] ; then
+                update="ko" # skip next action
+                break
+            fi
+        done  
+        if [ "$update" != "ko" ] ; then
+            echo
+            echo
+            gmsg Gaius -l -do "Lancement d'un mise à jour des paquets (apt-get update)"
+            echo
+            sudo apt-get update
+            sudo
+        fi
+        echo
+        gmsg Gaius -l -ok "Opération terminée"
+
+    # sinon on annule
+    else 
+        gmsg Gaius -l -notice "Opération annulée"
+    fi
+    
+else 
+    gmsg Gaius -l -notice "Opération annulée"
+fi  

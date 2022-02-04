@@ -1,0 +1,40 @@
+
+
+if [ -z "$2" ] ; then  
+    gmsg Gaius -notice "Usage: trad <phrase> <sourcelang> <outputlang>"
+    echo
+    gmsg Gaius -ask "Traduire:" 
+    read -p " " -e phrase
+    if [ -z "$phrase" ]; then
+        exit
+    fi
+else
+    phrase="$2"
+    dmsg "Phrase à traduire donnée en paramètre: $phrase"
+fi
+
+if [ -z "$3" ] ; then  
+    gmsg Gaius -ask "Depuis:" 
+    read -p " " -e sourcelang
+    if [ -z "$sourcelang" ]; then
+        exit
+    fi
+else
+    sourcelang="$3"
+    dmsg "Langue source: $sourcelang"
+fi
+
+if [ -z "$4" ] ; then  
+    gmsg Gaius -ask "Vers:" 
+    read -p " " -e outputlang
+    if [ -z "$outputlang" ]; then
+        exit
+    fi
+else
+    outputlang="$4"
+    dmsg "Langue de sortie: $outputlang"
+fi
+
+
+# TODO AVEC méthode API google mise à jour (les commands trouvées fonctionnaient pas)
+

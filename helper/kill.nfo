@@ -1,0 +1,1 @@
+Tuer un process sans se taper les commandes ps aux | grep nomduprocessus suivi d'un kill ID.

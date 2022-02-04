@@ -1,0 +1,15 @@
+# Tree : Affichage visuel des répertoires et de leur contenu
+#
+# Options:
+#	-d 	Uniquement les répertoires
+#	-f 	Affiche le chemin complet de chaque fichier
+# 	-t	Trie par dernières modifications (par défaut tri alphabétique)
+#	-C	Sortie en couleur
+#	-D	Affiche la date de dernière modification
+#	-F 	Indique le type du fichier
+# -Q  Affiche les noms de fichiers entre guillements (retire les séquences d'échappement)
+#
+# --dirsfirst Liste les répertoires avant les fichiers
+
+treepath=$PATH_BIN
+tree -CDFQ --dirsfirst $treepath

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+WEBAPPNAME="Arte"
+WEBAPPURL="http://www.arte.tv/guide/fr/direct"
+WEBAPPBROWSER="google-chrome"
+
+open_webapp $WEBAPPBROWSER $WEBAPPNAME $WEBAPPURL
+echo

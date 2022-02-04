@@ -1,0 +1,152 @@
+echo "
+OTHER HTML & ASCII SYMBOL CODES:
+
+↓ Down arrow &darr;
+‾ Overline &oline;
+← Left arrow &larr;
+→ Right arrow &rarr; 
+↑ Up arrow &uarr; 
+℠ Service Mark &#8480; 
+℃ Celsius &#8451; 
+℅ care of &#8453; 
+℉ Farenheit &#8457;
+№ numero symbol - number sign &#8470;
+℗ Sound Recording Copyright &#8471
+℞ Prescription Take pharmaceutical symbol &#8478
+Ω Ohm &#8486
+℧ Inverted Ohm &#8487
+☀ sunshine - sun &#9728
+☁ cloudy - cloud &#9729
+☂ raining - rain &#9730
+☃ snow - snowman &#9731
+☄ comet &#9732
+★ star solid &#9733
+☆ star outline &#9734
+☇ lightning &#9735
+☈ thunderstorm &#9736
+☉ sun &#9737
+☊ ascending node &#9738
+☋ descending node &#9739
+☌ conjunction &#9740
+☍ opposition &#9741
+☎ phone number - phone service &#9742
+☏ phone symbol outline &#9743
+☐ check box - ballot box &#9744
+☑ ballot box check mark &#9745
+☒ ballot box with X &#9746
+☓ Saltire - St. Andrew's Cross &#9747
+☚ left-pointing index finger &#9754
+☛ right-pointing index finger &#9755
+☜ left-pointing index finger &#9756
+☝ upwards pointing index finger &#9757
+☞ right pointing index finger &#9758
+☟ downwards pointing index finger &#9759
+☠ skull & crossbones &#9760
+☡ caution sign &#9761
+☢ radioactive sign &#9762
+☣ biohazard sign &#9763
+☤ Caduceus or Kerykeion &#9764
+☥ Ankh &#9765
+☦ Eastern Christian Cross &#9766
+☧ Chi Rho Cross &#9767
+☨ Patriarchal Cross &#9768
+☩ Greek Cross &#9769
+☪ Crescent Moon & Star &#9770
+☫ Farsi symbol &#9771
+☬ Adi Shakti &#9772
+☭ hammer & sickle &#9773
+☮ peace sign &#9774
+☯ yin & yang &#9775
+☰ trigram Heaven &#9776
+☱ trigram Lake &#9777
+☲ trigram Fire &#9778
+☳ trigram Thunder &#9779
+☴ trigram Wind &#9780
+☵ trigram Water &#9781
+☶ trigram Mountain &#9782
+☷ trigram Heaven &#9783
+☸ Dharma Wheel &#9784
+☹ frowning face &#9785
+☺ smiley face &#9786
+☻ black smiley face &#9787
+☽ waxing crescent moon &#9789
+☾ waning crescent moon &#9790
+☿ Mercury &#9791
+♀ Venus - Female symbol &#9792
+♁ Earth symbol &#9793
+♂ Mars - Male symbol &#9794
+♃ Jupiter &#9795
+♄ Saturn &#9796
+♅ Uranus &#9797
+♆ Neptune &#9798
+♇ Pluto &#9799
+♈ Aries &#9800
+♉ Taurus &#9801
+♊ Gemini &#9802
+♋ Cancer &#9803
+♌ Leo &#9804
+♍ Virgo &#9805
+♎ Libra &#9806
+♏ Scorpio &#9807
+♐ Sagitarius &#9808
+♑ Capricorn &#9809
+♒ Aquarius &#9810
+♓ Pisces &#9811
+♔ White King &#9812
+♕ White Queen &#9813
+♖ White Rook &#9814
+♗ White Bishop &#9815
+♘ White Knight &#9816
+♙ White Pawn &#9817
+♚ Black King &#9818
+♛ Black Queen &#9819
+♜ Black Rook &#9820
+♝ Black Bishop &#9821
+♞ Black Knight &#9822
+♟ Black Pawn &#9823
+♠ black spade suit name: &spades &#9824
+♡ red heart suit &#9825
+♢ red diamond suit &#9826
+♣ black club suit = shamrock name: &clubs &#9827
+♤ red spade suit &#9828
+♥ black heart suit = valentine name: &hearts &#9829
+♦ black diamond suit name: &diams &#9830
+♧ red club suit &#9831
+♨ hot springs &#9832
+♩ musical quarter note &#9833
+♪ musical eighth note &#9834
+♫ musical single bar note &#9835
+♬ musical double bar note &#9836
+♭ flat note &#9837
+♮ natural note &#9838
+♯ sharp note &#9839
+✁ cut above &#9985
+✂ cut here &#9986
+✃ cut below &#9987
+✄ scissors &#9988
+✆ public pay phone &#9990
+✇ film reel - tape spool &#9991
+✈ airport jet airplane &#9992
+✉ envelope mail email &#9993
+✌ victory sign &#9996
+✍ signature - sign here &#9997
+✎ pencil diagonal down &#9998
+✏ pencil &#9999
+✐ pencil diagonal up &#1000
+✓ check mark &#10003
+✔ heavy check mark &#10004
+✕ multiplication sign X &#100005
+✖ heavy multiplication sign X &#10006
+✗ ballot X &#10007
+✘ heavy ballot X &#10008
+✝ Latin Roman Cross &#10013
+✞ Latin Cross 3D shadow &#10014
+✟ Latin Cross outline &#10015
+✠ Maltese Cross &#10016
+✡ Star of David &#10017
+❛ quotation mark single turned comma &#10075
+❜ quotation mark single comma &#10076
+❝ quotation mark double turned comma &#10077
+❞ quotation mark double comma &#10078
+
+"

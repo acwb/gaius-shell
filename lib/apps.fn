@@ -1,0 +1,155 @@
+#!/bin/bash
+
+
+
+# vérification des dossiers du ~/
+function check_dirs {
+
+    gmsg Gaius -do "Vérification des dossiers.."
+    cd $PATH_USER
+    
+    if [ ! -d "Backups" ]; then
+        gmsg Gaius -l -do "Création du dossier ~/Backups"
+        mkdir "Backups"
+    elif [ ! -d "Downloads/incoming" ]; then
+        gmsg Gaius -l -do "Création du dossier ~/Downloads/*"
+        mkdir -p Downloads/{stream,archives,other,pdf,software,images,torrents,incoming}
+    elif [ ! -d "Transit/_Divers" ]; then
+        gmsg Gaius -l -do "Création du dossier ~/Transit/*"
+        mkdir -p Transit/{_DCIM,_Divers,_Musica,_Pedago,_Projets,_Videos}
+    else
+        dmsg "Tous les dossiers sont présents" && echo -e "\b\b :$BOLD$VERT1 R.A.S. $RESET"
+        sleep 0.2
+    fi
+    
+    if [ ! -d "Dropbox" ]; then
+        gmsg Gaius -l -error "Dropbox n'est pas installé"
+    fi
+    
+}
+
+
+# vérification dépendances (existances packages définis)
+function check_pkgs {
+
+    gmsg Gaius -do "Vérification des dépendances.."
+
+    PKGSTOINSTALL=""
+    for SOFTWARE in ${DEPENDENCIES[@]}; do
+        if dpkg -l $SOFTWARE >/dev/null 2>&1 ; then
+            if [ "$1" != "-q" ]; then
+                echo
+                gmsg Gaius -l -do "Dépendance satisfaite : $SOFTWARE" 
+            else    
+                dmsg "Dépendance satisfaite : $SOFTWARE" 
+            fi
+        else
+            echo
+            gmsg Gaius -l -error "Dépendance manquante: $SOFTWARE"
+            PKGSTOINSTALL="$PKGSTOINSTALL $SOFTWARE"
+            sleep 0.3
+        fi
+    done
+
+
+    if [ "$PKGSTOINSTALL" != "" ]; then
+        gmsg Gaius -ask "Installer les paquets manquants ? (O/n) "
+        read SURE
+
+        if [[ $SURE = "O" || $SURE = "o" || $SURE = "" ]]; then
+
+            if which apt-get &> /dev/null; then
+                gmsg Gaius -l -do "Installation de: $PKGSTOINSTALL" 
+                sudo apt-get install $PKGSTOINSTALL 
+            else
+                NOPKGMANAGER=TRUE
+                gmsg Gaius -l -error "Erreur d'installation. Paquet(s) manquants: $PKGSTOINSTALL"
+            fi
+
+            if [[ $? -eq 0 && ! -z $NOPKGMANAGER ]] ; then
+                echo "All dependencies are satisfied."
+                gmsg Gaius -l -ok "Tous les dépendances sont installées"
+
+            else
+                gmsg Gaius -l -error "Paquet(s) manquants: $PKGSTOINSTALL"
+            fi
+
+        else
+                gmsg Gaius -l -error "Paquet(s) manquants: $PKGSTOINSTALL"
+        fi
+    else
+        dmsg "Vérification des dépendances " && echo -e "\b\b :$BOLD$VERT1 R.A.S. $RESET"
+        sleep 0.2
+    fi
+    
+}
+
+
+
+function open_webapp { 
+    BROWSER="$1"
+    NAME="$2"
+    URL="$3"
+    $BROWSER --app=$URL &&
+    gmsg Gaius -ok "Ouverture de $NAME dans $BROWSER"
+    sleep 1
+    guake -t
+    echo
+}
+
+
+
+function create_webapp {
+
+    # on récupère les paramètres
+    BROWSER=$1  
+    NAME=$2
+    URL=$3
+    ICON=$4
+
+
+    # on traite l'argument url
+    if [[ $URL == "http://"* ]] || [[ $URL == "https://"* ]] ; then
+        dmsg "Le paramètre url commence par http:// => méthode --app"
+        apparg="--app=$URL"
+        appclass="url_$NAME"
+        dmsg "Argument: $apparg .. Class: $appclass"
+    else
+        dmsg "Le paramètre url ne commence pas par http:// => méthode --app-id"
+        apparg="--app-id=$URL"
+        appclass="crx_$URL"
+        dmsg "Argument: $apparg .. Class: $appclass"
+    fi
+
+    # template du fichier desktop
+    # /!\ blog EOF sans indentation/tab !
+    
+cat >$WEBAPP_DSKTPATH/$NAME.desktop <<EOL
+#!/usr/bin/env xdg-open
+# fichier créé par create_webapp() le $today à $now
+
+[Desktop Entry]
+Version=1.0
+Terminal=false
+Type=Application
+Name=$NAME
+Exec=$BROWSER $apparg --profile-directory=Default --class=$appclass
+Icon=$ICON
+StartupWMClass=$appclass
+windowclass=$appclass
+class=$appclass
+EOL
+
+    if [ ! -f $WEBAPP_DSKTPATH/$NAME.desktop ]; then # on vérifie l'existence du fichier
+        gmsg Gaius -l -error "Le fichier $WEBAPP_DSKTPATH/$NAME.desktop n'a pas été créé"
+        dmsg "Contenu du fichier $WEBAPP_DSKTPATH/$NAME.desktop :"
+        echo    
+        cat $WEBAPP_DSKTPATH/$NAME.desktop
+    else
+        
+    gmsg Gaius -l -ok "WebApp $NAME créée avec succès "
+    dmsg "Fichier $WEBAPP_DSKTPATH/$NAME.desktop créé avec succès"
+    echo
+    fi
+        
+}

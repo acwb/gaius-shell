@@ -1,0 +1,6 @@
+Téléchargement de la piste audio de la vidéo Youtube* fournie - via le script <youtube-dl>
+Pour télécharger la vidéo complète, utiliser la commande <vdl>
+Pour télécharger des vidéos en lot, les ajouter au fichier todl via la commande <todl> puis <ytdl>
+
+* TODO: tester d'autres hébergeurs (check liste officielle)
+* TODO: modifier noms des commandes youtube ? (yt-vdl, yt-adl)

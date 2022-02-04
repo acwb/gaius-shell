@@ -1,0 +1,13 @@
+#!/bin/bash
+
+for f in $PATH_SND/* ; do
+  echo
+  echo -n "Nom du fichier: "
+  basename "$f"
+  paplay $f
+  gmsg Gaius -notice "Appuyer sur une touche pour arrêter la lecture."
+  read -1 -s -n 1 -p " " key 
+  if [ "$?" -eq "0" ] ; then
+    break
+  fi
+done

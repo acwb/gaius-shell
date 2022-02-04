@@ -1,0 +1,6 @@
+Permet d'envoyer des instrutions à transmission-deamon qui tourne sur le serveur. Commandes disponibles : 
+[add] ajouter un torrent via son url
+[clean] supprimer les torrents terminés
+[limit] [unlimit] limitations de débit alternatives
+[speed] spécifier une limite de débit download
+[restart] relancer le daemon

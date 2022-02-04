@@ -1,0 +1,4 @@
+#!/bin/bash
+
+gmsg Gaius -l -do "Extinction de l'écran"
+sleep 1; xset dpms force off 

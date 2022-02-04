@@ -1,0 +1,15 @@
+#!/bin/bash
+
+numfiles=($PATH_CMD/*)
+numfiles=${#numfiles[@]}
+echo -e -n "$numfiles commandes disponibles. $GRIS2"
+
+
+if [ "$2" != "--donotlist" ];then
+    echo -e ' Utiliser <help> [commande] pour en avoir une description'
+    echo 
+    ls $PATH_LOG/history -t
+    echo
+else
+    echo "Utiliser la commande <cmd> pour les lister"
+fi

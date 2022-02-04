@@ -1,0 +1,15 @@
+echo
+
+if [ -z "$2" ] ; then  
+
+    gmsg Gaius -notice "Consulter et rechercher sur doc.ubuntu-fr.org :"
+    read -p " " -e search
+    if [ -z "$search" ]; then
+        exit
+    fi
+else
+    search="$2"
+fi
+
+open_webapp google-chrome doc.Ubuntu-fr https://www.google.fr/search?q=$search+site%3Adoc.ubuntu-fr.org
+        

@@ -1,0 +1,36 @@
+#!/bin/bash
+trap bashtrap INT
+
+    nbvidtodl=`sed -n '$=' $PATH_TMP/todl.txt`
+    echo -n -e "$GRIS2" && cat $PATH_TMP/todl.txt && echo -n -e "$RESET"
+    gmsg Gaius -notice "Le fichier TODL contient $nbvidtodl liens, lancer le téléchargement des vidéos ? (o/N)"
+    read -p " " -n 1 -r
+    if [[ $REPLY =~ ^[oO]$ ]]
+        then
+            echo
+            gmsg Gaius -l -do "Lancement du téléchargement des $nbvidtodl vidéos.."
+            
+            echo    
+            cd $PATH_DL/stream/
+            # on récupère l'idée du terminal courant
+            #currenttab=$(guake -g)
+            # on ouvre un nouveau prompt
+            #guake --new-tab=2 --rename-tab="Gaius" --execute-command="Gaius" 
+            # on reswitch sur celui d'origine
+            #guake -s $currenttab
+            youtube-dl --no-playlist --ignore-errors --write-description --no-overwrites -o "%(extractor)s/%(uploader)s_%(title)s/%(title)s_%(width)sx%(height)s.%(id)s.%(ext)s" --batch-file $PATH_TMP/todl.txt
+            echo
+    else
+        echo
+        gmsg Gaius -l -error "Téléchargements annulés"
+    fi
+    gmsg Gaius -notice "Vider le fichier TODL ? (o/N)"
+    read -n 1 confirmdel
+    echo
+    if [[ $confirmdel =~ ^[oO]$ ]] ; then 
+        rm $PATH_TEP/todl.txt
+        touch $PATH_TMP/todl.txt
+        gmsg Gaius -l -warn "Fichier TODL réinitialisé"
+    else
+        gmsg Gaius -l -warn "Fichier TODL laissé en état"
+    fi 

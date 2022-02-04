@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+    echo -n "URL du fichier : "
+    read urlfile
+    if [ -z "$urlfil" ]; then
+        echo $urlfile >> $PATH_TMP/todl.txt
+        nbvidtodl=`sed -n '$=' $PATH_TMP/todl.txt`
+        echo
+        gmsg Gaius -ok "$urlfile ajouté au $nbvidtodl URLs du fichier TODL"
+    fi

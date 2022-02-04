@@ -1,0 +1,24 @@
+#!/bin/bash
+
+    gmsg Gaius -notice "Message Of The Day actuel: "
+    cat $PATH_TMP/motd.txt
+    
+    gmsg Gaius -ask "Purger le fichier ? [o/N] "
+    read confirmdel
+    
+    if [[ $confirmdel =~ ^[oO]$ ]] ; then 
+        rm $PATH_TMP/motd.txt
+        touch $PATH_TMP/motd.txt
+        gmsg Gaius -l -do "Fichier $PATH_TEMP/motd.txt vidé"
+    else
+        gmsg Gaius -l -notice "Fichier $PATH_TEMP/motd.txt laissé en état"
+    fi 
+    
+    if [ -n "$note" ]; then 
+        echo "$note" >> $PATH_TMP/motd.txt
+        gmsg Gaius -l -ok "Motd enregistré"
+        gmsg Gaius -do "Nouveau motd : "
+        read note
+    else
+        gmsg Gaius -l -notice "Motd conservé"
+    fi

@@ -1,0 +1,126 @@
+#!/bin/bash
+
+ 
+file="/sys/class/power_supply/"
+battery="BAT0"
+path=$file$battery
+
+# pourcentages d'alertes
+ALERT_PERC_1=40
+ALERT_PERC_2=20
+
+
+
+# si batterie non détectée
+if [ ! -f $path/status ]; then
+    gmsg Alim -l -warn "Attention, la batterie n'est pas détectée, keep me plugged."   
+
+else
+    
+    # statut courant de la batterie (Charging / Discharging)
+    bat_status=$(cat $path"/status")
+    
+    # charge courante de la batterie
+    typeset -i charge_now=$(cat $path"/charge_now")
+
+    # charge maximum
+    typeset -i charge_full=$(cat $path"/charge_full")
+
+    # calcul de la différence et du pourcentage
+    dif=$((charge_full - charge_now))
+    perc=$((100-(100*dif/charge_full)))
+    
+
+    # qq var de coté (to delete)
+    battcapa=${perc}
+    battstatus=$bat_status
+    battinfos="$battcapa ($battstatus) "
+
+    # avertissement mauvais status
+    if [ "$bat_status" == "Unknown" ] ; then
+        gmsg Alim -l -warn "Attention, le statut de la batterie n'est pas fiable, keep me plugged." 
+    else 
+        if [ "$bat_status" == "Charging" ] && [ "$perc" -gt 100 ] ; then
+            gmsg Alim -l -ok "Batterie pleine, sur secteur" 
+        else
+            gmsg Alim -l -notice "Batterie en service - $bat_status à $perc%" 
+
+        fi
+    fi
+    
+    
+    # si on a mis des paramètres à la commande battery
+
+    
+        if [ "$2" == "status" ] ; then
+            echo "$bat_status - $perc"
+        elif [ "$2" == "test" ] ; then
+            echo "TODO"
+
+        fi
+
+   
+    
+    
+    # on créé une boucle d'alertes
+        
+    if [ "$bat_status" == "Discharging" ] || [ "$bat_status" == "Unknown" ]  ; then
+    
+        # niveau d'alerte 1
+        while [ "$perc" -lt "$ALERT_PERC_1" ] && [ "$perc" -ge "$ALERT_PERC_2" ]  ; do
+            amixer -D pulse sset Master 100% &>/dev/null
+            notify-send "BATTERIE" "${perc} %"
+            echo -n -e "\r Alerte: batterie chargée à $perc - Bancher au secteur"
+            
+            
+            bat_status2=$(cat $path"/status")
+             if [ "$bat_status2" == "Charging" ]; then
+                echo "nouveau statut : charging"
+                break
+            fi
+            sleep 1.6
+            amsg error 
+            sleep 1.6
+            amsg error 
+            sleep 1.6   
+            amsg warning 
+            amixer -D pulse sset Master 50% &>/dev/null
+        done
+        
+        # niveau d'alerte 2
+        while [ "$perc" -lt "$ALERT_PERC_2" ] ; do
+            amixer -D pulse sset Master 100% &>/dev/null
+            notify-send "BATTERIE" "${perc} %"
+            echo -n -e "\r Alerte: batterie chargée à $perc - Bancher au secteur"
+            bat_status2=$(cat $path"/status")
+             if [ "$bat_status2" == "Charging" ]; then
+                #echo "nouveau statut : charging"
+                
+                break
+            fi
+            sleep 0.5
+            amsg error
+            sleep 0.5
+            amsg error
+            sleep 0.5
+            amsg error
+            sleep 0.5
+            amsg warning
+            sleep 0.5
+            amsg error
+            sleep 0.5
+            amsg error
+            sleep 0.5
+            amsg alarm
+            amixer -D pulse sset Master 50% &>/dev/null
+            
+        done
+        
+        
+             
+    fi
+    
+
+ 
+
+fi

@@ -1,0 +1,148 @@
+#!/bin/bash
+
+function fixwifi {
+    CURRENTWIFI="`iwgetid -r`"
+    if [ "$CURRENTWIFI" == "FreeWifi" ]; then
+        gmsg Gaius -l -n -notice "Connecté au FreeWifi, tentative de switch vers réseau wifi"
+        nmcli device wifi connect "XXXX"    password "XXXX" iface wlan0 --timeout 10
+    fi 
+    if [ "$CURRENTWIFI" == "XXXXX-CPL" ]; then
+        gmsg Gaius -l -n -notice "Connecté au CPL, tentative de switch vers réseau wifi"
+        nmcli device wifi connect "XXXX"    password "XXXX" iface wlan0 --timeout 10
+    fi 
+}
+
+function pingfbx { # test connectivité freebox, méthode ping
+    if ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null; then
+        return 0
+    else
+        return 1  
+    fi
+}
+
+
+function testfbx { # test connectivité freebox, méthode wget + dl data (plus long)
+    if wget -q "http://mafreebox.freebox.fr/pub/fbx_info.txt" > /dev/null; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function testconnex { # test accès à internet
+
+    fixwifi # au cas ou on soit sur freewifi
+
+    # on commence par tester la connectivité avec la freebox, méthode wget + mise à jour du fichier txt infos
+    if pingfbx "1" ; then
+    
+        
+        
+        if [ "$FBXFAIL" -ge "1" ] ; then # si il y a eu au moins 1 échec
+            notify-send "Freebox" "Connexion rétablie"
+            gmsg Fbox -l -ok "Connexion rétablie"
+        fi
+        
+        dmsg "Récupération de l'IP locale : $LOCALIP"
+        REALIP="`dig +short myip.opendns.com @resolver1.opendns.com`"
+        dmsg "Récupération de l'IP externe : $REALIP"
+        CURRENTWIFI="`iwgetid -r`"
+        dmsg "Récupération du nom du réseau wifi : $CURRENTWIFI"
+        prompterror="0"
+        FBXFAIL="0"
+        FBXSTATUS="1"
+        make_flag wifi on
+        make_flag offline off
+        wifi_status
+    else
+        dmsg "Passerelle réseau injoignable"
+        prompterror="1"
+        FBXSTATUS="0"
+        ISONLINE="0" 
+    fi
+
+    # on test que si la freebox répond
+    if [ "$FBXSTATUS" == "1" ] ; then
+
+        # on teste la connexion en envoyant un spider à google
+        dmsg "Envoi d'un spider vers google.com"
+        wget --spider "http://www.google.com" >/dev/null 2>&1
+        
+        if [ $? -ne 0 ]; then
+        # si on a pas de réponse ($?=0 si on a une réponse)
+        dmsg "Pas de réponse du spider vers google.com"
+
+            # on retente une 2e fois au cas où
+            sleep 0.2
+            wget --spider http://www.yahoo.com >/dev/null 2>&1
+            dmsg "Envoi d'un spider vers yahoo.com"
+
+            # on peut commencer à considérer que la connexion est HS
+            if [ $? -ne 0 ]; then
+                dmsg "Pas de réponse du spider vers yahoo.com"
+                dmsg "On peut considérer qu'on est offline"
+                # on touche au flag de connectivité
+                make_flag wifi off
+                ISONLINE="0" 
+            else
+                dmsg "Google offline mais Yahoo online ??"
+            fi
+
+        # si on reçoit une réponse
+        else 
+
+            dmsg "Réponse du spider vers google.com OK"
+
+
+            make_flag wifi on
+            make_flag offline off
+            ISONLINE="1"
+
+        fi
+    
+    elif [ "$ISONLINE" == "0" ] || [ "$FBXSTATUS" == "0" ] ; then
+    
+        # si on a pas encore activé le mode offline
+        if [ "`flag offline`" != "on" ] ; then
+
+            
+            ((FBXFAIL++))
+            wait=$((FBXFAIL*5))
+            amsg busy
+            if [ "$FBXFAIL" -ge "2" ] ; then # si il y a eu au moins 1 échec
+                amsg out
+                gmsg Gaius -l -n -echec "Freebox injoinable ($FBXFAIL échecs, nouvelle tentative dans $wait sec)"
+                
+            else
+                amsg out
+                gmsg Gaius -l -n -error "Connexion indisponible"
+                prompterror="1"
+                make_flag wifi off
+                wait="2"
+                sleep 1
+            fi
+           
+
+            # et on propose le mode offline (ne prévient plus)
+            gmsg Gaius -ask "Appuyer sur une touche pour continuer en mode offline"
+            read -t $wait -s -n 1 -p " " key 
+            if [ "$?" -eq "0" ] ; then
+                echo
+                make_flag offline on                       
+                prompterror="2"
+                gmsg Gaius -l -notice "Mode offline activé"
+            else
+                echo
+                make_flag offline off                        
+                gmsg Gaius -l -do "Tentative de reconnexion.."
+                sleep 0.5                
+                testconnex -v
+            fi 
+        fi
+    fi
+
+}
+  
+  
+  
+  

@@ -1,0 +1,3 @@
+gmsg Gaius -notice "$2 = $BOLD"
+awk "BEGIN{ print $* }"
+echo "$RESET"

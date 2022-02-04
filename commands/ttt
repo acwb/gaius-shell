@@ -1,0 +1,2 @@
+#!/bin/bash
+ssh toto@192.168.0.10 -p 5910 "bin/ttt"

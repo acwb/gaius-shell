@@ -1,0 +1,4 @@
+#!/bin/bash
+
+$APP_BROWSER --incognito $2 $3 $4 $5
+guake -t

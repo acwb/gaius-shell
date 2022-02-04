@@ -1,0 +1,47 @@
+#!/bin/bash
+       
+function explainGMSG {        
+    clear
+    echo -e "$BOLD Fonction gmsg $RESET"
+    echo
+    echo "gmsg Name -t 5 -type ''Message'' -line"
+    echo
+    echo "Nom : de l'émetteur du message"
+    echo "-t 5 (optionnel) : attentre 5 sec après le message" 
+    echo "-type (optionnel) : ok, notice, say, error, warn"
+    echo "-l (optionnel) : retour à la ligne après le message"  
+    echo "Message : entre guillemets"
+    echo
+    sleep 1
+    echo "Exemples et demo :"
+    sleep 1
+    echo
+    gmsg Test -minus "gmsg Test" 
+    echo
+    gmsg Test -notice "gmsg Test -notice"
+    echo
+    gmsg Test -l -warn "gmsg Test -l -warn"
+    echo
+    gmsg Test -error "gmsg Test -t 1 -error"
+    echo
+    gmsg Test -l -say "gmsg Test -t 2 -l -say"
+    echo
+    gmsg Test -l -ok "gmsg Test -t 4 -ok" 
+}
+
+function explainRUNCMD {
+    echo "TODO"
+}
+
+
+# si on a préciser un paramètre
+if [ -z "$2" ] ; then
+    echo "Documentation disponible sur les fonctions: gmsg, runcmd"
+else
+    # si ce paramètre est
+    case $2 in
+        gmsg) explainGMSG ;;
+        runcmd) explainRUNCMD ;;
+        *) echo "Pas de documentation sur cette fonction" ;;
+    esac
+fi

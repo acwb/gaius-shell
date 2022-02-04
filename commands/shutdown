@@ -1,0 +1,28 @@
+#!/bin/bash
+
+echo
+
+if [ "$2" == "-f" ] ; then
+    echo
+    dmsg "Commande shutdown avec l'option -f (force)"
+    gmsg Gaius -l -ok "See you soon master.." ;
+    shutdown -h now
+
+else
+
+    clear
+    for (( i=10; i>0; i--)); do
+        printf "\r$BOLD$CYAN1 Gaia → $RESET Extinction dans $GRIS1$BOLD$i$RESET secondes, presser une touche pour annuler"
+        read -s -n 1 -t 1 key
+        if [ $? -eq 0 ]
+        then
+            echo
+            gmsg Gaius -l -notice "Extinction annulée"
+            exit
+        fi
+    done
+    echo
+    gmsg Gaius -l -ok "See you soon master.." ;
+    shutdown -h now
+
+fi

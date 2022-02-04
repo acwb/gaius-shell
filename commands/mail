@@ -1,0 +1,9 @@
+SUBJECT="Gaius Notif"
+TO="XXXXX@XXXX.XXX"
+MSG="/home/toto/Dropbox/Applications/todotxttdi/todo.txt"
+
+gmsg Gaius -l -do "Envoi d'un email de test à $TO.."
+
+mail -s "$SUBJECT" -aFrom:Gaius "$TO" < $MSG
+
+gmsg Gaius -l -ok "Email de test envoyé"

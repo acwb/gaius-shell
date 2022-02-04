@@ -1,0 +1,3 @@
+Lance un compte à rebours avant alarme ou l'execution d'une commande
+Paramètres:  <durée>  par ex: 30s, 2m, 5h ou hh:mm:ss
+             <commande>  commande à executer à la fin du compte à rebours (optionnel)

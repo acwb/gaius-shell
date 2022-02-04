@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo
+source $PATH_SCR/pushbullet list

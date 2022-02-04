@@ -1,0 +1,60 @@
+#!/bin/bash
+
+
+# si argument, affiche le helper correspondant
+if [ -z "$2" ] ; then
+    echo "TODO : affiche help complet"
+else
+
+    # si il y a un 2e argument entre guillemets
+    # c'est qu'on veut créer ou modifier un helper
+    if [[ $3 == "\""* ]] ; then
+        
+        # on check existence du fichier
+        if test -f "$PATH_CMD/$2"; then 
+        
+            # si fichier existant, on affiche son contenu
+            gmsg Gaius -warning "[Le fichier helper $2 existe déja :] "
+            cat $PATH_HLP/$2.nfo
+            echo
+            # on overwrite après confirmation
+            gmsg Gaius -l -ask "Confirmer l'overwrite [*/Enter] ?"
+            read -p " " -r confirm
+            if [ -n "$confirm" ] ; then
+                # on vire les guillemets
+                helpmsg=${3#"|"}
+                helpmsg=${3%"|"}
+                # on enregistre dans le fichier
+                touch $PATH_HLP/$2.nfo
+                cd $PATH_HLP
+                echo "$helpmsg" > $PATH_HLP/$2.nfo
+            else
+                # fichier laissé en état, argument non enregistré
+                gmsg Gaius -notice "Fichier laissé en état, entrée non-enregistée :"
+                echo " $3"
+            fi
+        # sinon, si le fichier n'existe pas
+        else
+            # on enregistre $3 dans le fichier
+            # on vire les guillemets
+            helpmsg=${3#"|"}
+            helpmsg=${3%"|"}
+            # on enregistre dans le fichier
+            touch $PATH_HLP/$2.nfo
+            cd $PATH_HLP
+            echo "$helpmsg" > $PATH_HLP/$2.nfo
+        fi
+        
+    
+    else
+    # si il n'y a qu'un argument on affiche juste le helper de la cmd (identique à la fonction
+
+        # vérification existence script
+        if test -f "$PATH_CMD/$2"; then 
+            hmsg -f $2
+        else 
+            gmsg Gaius -error "Erreur: la commande $2 n'existe pas\e[39m" ;
+            echo
+        fi
+    fi
+fi

@@ -1,0 +1,67 @@
+#!/bin/bash
+### System Setup ###
+
+### Config destination
+SCPU="toto"
+SCPP="22"
+
+
+notify-send Gaius "Lancement d'un transfert des fichiers en transit"
+echo
+gmsg Gaius -notice "Lancement d'un transfert des fichiers en transit de Gaia vers Datacenter..."
+echo
+
+
+
+echo ">> Transferts de ~/Transit/_Pedago..."
+SCPS="192.168.0.200"
+scp -P $SCPP -r /home/toto/Transit/_Pedago/*  $SCPU@$SCPS:Transit/from_Gaia/_Pedago/
+rm -f /home/toto/Transit/_Pedago/* 
+echo ">>> OK !"
+echo
+
+echo ">> Transferts de ~/Transit/_Projets..."
+SCPS="192.168.0.200"
+scp -P $SCPP -r /home/toto/Transit/_Projets/*  $SCPU@$SCPS:Transit/from_Gaia/_Projets/
+rm -f /home/toto/Transit/_Projets/*
+echo ">>> OK !"
+echo
+
+echo ">> Transferts de ~/Transit/_Videos..."
+SCPS="192.168.0.200"
+scp -P $SCPP -r /home/toto/Transit/_Videos/*  $SCPU@$SCPS:Transit/from_Gaia/_Videos/
+rm -f /home/toto/Transit/_Videos/*
+echo ">>> OK !"
+echo
+
+echo ">> Transferts de ~/Transit/_Docus..."
+SCPS="192.168.0.100"
+scp -P $SCPP -r /home/toto/Transit/_Docus/*  $SCPU@$SCPS:Volume_2/Docus/&incoming/
+rm -f /home/toto/Transit/_Docus/*
+echo ">>> OK !"
+echo
+
+echo ">> Transferts de ~/Transit/_Musica..."
+SCPS="192.168.0.100"
+scp -P $SCPP -r /home/toto/Transit/_Musica/*  $SCPU@$SCPS:Volume_1/_TRANSIT/_TOTAG/
+rm -f /home/toto/Transit/_Musica/* 
+echo ">>> OK !"
+echo
+
+echo ">> Transferts de ~/Transit/_Divers..."
+SCPS="192.168.0.200"
+scp -P $SCPP -r /home/toto/Transit/_Divers/*  $SCPU@$SCPS:Transit/from_Gaia/_Divers/
+rm -f /home/toto/Transit/_Divers/* 
+echo ">>> OK !"
+echo
+
+echo ">> Transferts de ~/Transit/_DCIM..."
+SCPS="192.168.0.200"
+scp -P $SCPP -r /home/toto/Transit/_DCIM/*  $SCPU@$SCPS:Transit/from_Gaia/_DCIM/
+rm -f /home/toto/Transit/_DCIM/* 
+echo ">>> OK !"
+echo
+
+gmsg Gaius -ok "Transit terminé !"
+echo
+notify-send Gaius "Transit terminé !"

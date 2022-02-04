@@ -1,0 +1,22 @@
+#!/bin/bash
+
+now=$(date +"%T")
+
+
+params="$@" # on récupère l'input complet
+
+# si il contient que la commande = pas d'argument
+if [ "$params" == "todo" ] ; then
+    echo
+    gmsg Gaius -l -do "Le fichier TODO contient :"
+    cat $PATH_TMP/todo.txt
+  
+# sinon il s'agit d'un ajout de todo
+else
+    params=${params:5}
+    echo "$today $now  ✗  $params" >> $PATH_TMP/todo.txt
+    echo
+    gmsg Gaius -l -ok "Ligne ajoutée au fichier TODO "
+    echo
+           
+fi

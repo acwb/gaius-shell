@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# PARAMETRES
+
+# video test (test en url)
+testvidurl="https://www.youtube.com/watch?v=rFOl-9SNxLY"
+
+# paramètres pour youtube-dl
+ytparam="--extract-audio  --no-playlist --embed-thumbnail --audio-quality 0 --audio-format mp3 -o \"audio/%(extractor)s/%(title)s.%(ext)s\" "
+
+
+if [ -n "$2" ] ; then
+    vidurl="$2"
+else
+    gmsg Gaius -notice "URL de la vidéo à télécharger ?"
+    echo -n " "
+    read vidurl
+fi
+
+if [ -n "vidurl" ] ; then
+
+        gmsg Gaius -l -notice "Lancement du téléchargement de l'audio de $vidurl"
+        echo
+        cd $PATH_DL/stream/
+        # on récupère l'idée du terminal courant
+        currenttab=$(guake -g)
+        # on ouvre un nouveau prompt
+        guake --new-tab=2 --rename-tab="Gaius" --execute-command="Gaius" 
+        # on reswitch sur celui d'origine
+        guake -s $currenttab
+        youtube-dl $ytparam $vidurl 
+        echo
+        gmsg Gaius -l -n -notice "Opération terminée"
+
+
+else 
+    gmsg Gaius -l -n -notice "Opération annulée"
+fi  
+
+

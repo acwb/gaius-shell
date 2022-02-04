@@ -1,0 +1,116 @@
+______________________________________________________________________
+
+                      Etat de la Freebox                           
+______________________________________________________________________
+
+
+Informations générales :
+========================
+
+  Modèle                         Freebox ADSL            
+  Version du firmware            1.5.20                  
+  Mode de connection             Dégroupé                
+  Temps depuis la mise en route  2 jours, 2 heures, 56 minutes
+
+
+Téléphone :
+===========
+
+  Etat                           Ok                      
+  Etat du combiné                Raccroché               
+  Sonnerie                       Inactive                
+
+
+Adsl :
+======
+
+  Etat                           Showtime                
+  Protocole                      ADSL2                   
+  Mode                           Interleaved             
+
+                         Descendant         Montant           
+                         --                 --                
+  Débit ATM              5830 kb/s          961 kb/s          
+  Marge de bruit         6.90 dB            4.80 dB           
+  Atténuation            44.00 dB           21.90 dB          
+  FEC                    2153897            44107             
+  CRC                    28605              0                 
+  HEC                    933                4705              
+
+ Journal de connexion adsl :
+ ---------------------------
+
+  Date                   Etat               Débit (kb/s)      
+  --                     --                 --                
+  Mise en route          Connexion          6852 / 988        
+  Mise en route          Déconnexion                          
+
+
+Wifi :
+======
+
+  Etat                           Ok                      
+  Modèle                         Ralink RT61             
+  Canal                          12                      
+  État du réseau                 Activé                  
+  Ssid                           XXXXXXXXXXXXX                   
+  Type de clé                    WPA (TKIP+AES)          
+  FreeWifi                       Actif                   
+  FreeWifi Secure                Actif                   
+
+
+Réseau :
+========
+
+  Adresse MAC Freebox            00:07:CB:44:6A:25       
+  Adresse IP                     XXX.XXX.XXX.XXX          
+  IPv6                           Désactivé               
+  Mode routeur                   Activé                  
+  Adresse IP privée              192.168.0.254           
+  Adresse IP DMZ                 192.168.0.0             
+  Adresse IP Freeplayer          192.168.0.15            
+  Réponse au ping                Activé                  
+  Proxy Wake On Lan              Désactivé               
+  Serveur DHCP                   Activé                  
+  Plage d'adresses dynamique     192.168.0.80 - 192.168.0.99
+
+ Attributions dhcp :
+ -------------------
+
+  Adresse MAC            Adresse IP                  
+  --                     --                          
+  XX:XX:XX:XX:XX:XX      192.168.XX.XX                
+  XX:XX:XX:XX:XX:XX      192.168.XX.XX                
+  XX:XX:XX:XX:XX:XX      192.168.XX.XX                
+  XX:XX:XX:XX:XX:XX      192.168.XX.XX                
+  XX:XX:XX:XX:XX:XX      192.168.XX.XX                
+  XX:XX:XX:XX:XX:XX      192.168.XX.XX                
+  XX:XX:XX:XX:XX:XX      192.168.XX.XX                
+  XX:XX:XX:XX:XX:XX      192.168.XX.XX                
+
+ Redirections de ports :
+ -----------------------
+
+  Protocole              Port source    Destination    Port destination
+  --                     --             --             --            
+  TCP                    80             192.168.XX.XX   80                   
+  TCP                    25             192.168.XX.XX   25                  
+
+ Redirections de plage de ports :
+ --------------------------------
+
+  Protocole              Destination        Plage de redirection
+  --                     --                 --                
+  TCP                    192.168.XX.XX       8000 - 8001       
+  TCP                    192.168.XX.XX       6666 - 6669       
+  TCP                    192.168.XX.XX      55536 - 55663     
+
+ Interfaces réseau :
+ -------------------
+
+                         Lien           Débit entrant  Débit sortant 
+                         --             --             --            
+  WAN                    Ok             398 ko/s       41 ko/s       
+  Ethernet               100baseTX-FD   0 ko/s         0 ko/s        
+  USB                    Non connecté                                
+  Switch                 100baseTX-FD   37 ko/s        163 ko/s      

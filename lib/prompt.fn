@@ -1,0 +1,158 @@
+#!/bin/bash
+
+HISTSIZE=9000
+HISTFILESIZE=$HISTSIZE
+HISTCONTROL=ignorespace:ignoredups
+
+shopt -s histappend
+    
+    
+function prompt { # affichage du prompt/rentre dans le loop
+    source /home/toto/bin/inc/prompt.sh
+}
+
+function prompt_check { # verif usuels à chaque prompt
+    
+    
+    
+    # a-t-on besoin de vérifier quelque chose d'autre
+    waittocheck="-600"
+    nowcheck=$(date +%s)
+    timecheck=$(($lastcheck - $nowcheck))
+    dmsg "${timecheck:1} secondes se sont écoulées depuis la dernière commande"
+  
+    if [ "$timecheck" -lt "$waittocheck" ]; then        
+        dmsg "On lance donc quelques vérifications.."
+        # vérification derniere maj / dernier backup
+        gaius_sync -q      
+        # check de la connectivité
+        dmsg "Vérification de la connexion.."
+        testconnex
+    fi
+  
+    # on garde de coté le timestamp de la dernière action
+    lastcheck=$(date +%s)
+    
+    # couleur du symbole prompt en fonction de l'état de connex
+    if [ "$prompterror" == "0" ]; then
+        PCOLOR="$JAUNE1"
+        dmsg "Aucune$PCOLOR erreur$RESET lors de la dernière commande"
+        
+        # check du statut wifi / offline
+        if [ "`flag wifi`" == "off" ] && [ "`flag offline`" == "off" ] ; then
+            PCOLOR="$ROUGE1"
+            dmsg "Flag wifi sur$PCOLOR OFF$RESET"        
+        elif [ "`flag wifi`" == "off" ] && [ "`flag offline`" == "on" ]; then
+            PCOLOR="$BLEU2"
+            dmsg "Flag offline sur$PCOLOR ON$RESET"  
+        fi
+        
+    elif [ "$prompterror" == "1" ]; then
+        PCOLOR="$ROUGE1"
+        dmsg "Une$PCOLOR Erreur$RESET lors de la dernière commande"
+    elif [ "$prompterror" == "2" ]; then
+        PCOLOR="$BLEU2"
+        dmsg "Une$PCOLOR erreur$RESET lors de la dernière commande a été ignorée"
+    else
+        PCOLOR="$GRIS1"
+        dmsg "Erreur: variable prompterror vide"
+    fi
+    
+    
+    
+  
+}
+
+function welcome {
+
+    # random welcome msg
+    arr[0]="Hello master, what's on your mind ?"
+    arr[1]="Hello master, what do you have in mind ?"
+    arr[2]="Hello master, what can I do for you ?"
+    arr[3]="Hello master, I live to serve."
+    arr[4]="Hello master, what's up ? "
+
+    rand=$[ $RANDOM % 4 ]
+    welcomemsg=${arr[$rand]}
+    
+    
+    gmsg Gaius -say "$BOLD$welcomemsg$RESET" | pv -qL 50
+    notify-send "Gaius:" "$welcomemsg"
+    sleep 0.3
+    amsg welcome
+    
+}
+
+
+
+function runcmd {
+
+# TODO: brainstormer pour gestion des commandes, alias, autocorrect....
+
+    
+    
+    # vérification existance script et lancement
+    if test -f "$PATH_CMD/$1"; then 
+        hmsg $1
+        cmdlog $1 $2 $3 $4 $5 $6 $7 $8 $9
+        prompterror="0"
+        echo
+        source $PATH_CMD/$1 ; 
+    else
+        if [ "`flag shell`" == "on" ] ; then
+            echo
+            prompterror="0"
+            eval $reps
+            ret_code=$?
+            if [ $ret_code != 0 ]; then
+              echo
+              gmsg Gaius -l -error "La commande $1 s'est terminée par une erreur "
+              prompterror="1"
+            fi
+        else
+            echo
+            gmsg Gaius -l -error "Erreur: la commande $1 n'existe pas, éxecuter dans le shell ? [o]"
+            prompterror="1"
+            read -t 2 -s -n 1 -p "" confirmdel 
+            if [[ $confirmdel =~ ^[oO]$ ]] ; then 
+                echo
+                eval $reps
+                prompterror="0"
+            fi
+        fi
+        
+        echo
+    fi
+}
+
+
+function reprompt { # retour header/prompt sans reload/init
+    echo
+    source $PATH_CMD/header
+    echo
+    echo
+    prompt
+}
+
+
+function bashtrap { # va en sorte de réafficher le prompt lors d'une erreur ou ctrl C
+    echo
+    gmsg Gaius -l -q -error "Interruption"
+    ps aux | grep -ie paplay | awk '{print $2}' | xargs kill -9 
+    prompterror="1"
+    prompt
+}
+
+function gbreak { # sort du shell
+    gmsg Gaius -l -q -error "Interruption"
+    ps aux | grep -ie gaius | awk '{print $2}' | xargs kill -9 && echo
+}
+
+function cmdlog {
+
+    touch $PATH_LOG/history/$1
+    cd $PATH_LOG/history
+    echo "[$today $now] $SYMB $@" | cat - $1 > temp && mv temp $1
+
+
+}
